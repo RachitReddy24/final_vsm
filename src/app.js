@@ -3,34 +3,42 @@ const cors = require("cors");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Routes
-app.use("/api/auth", require("./routes/auth.routes"));
+//user
 app.use("/api/users", require("./routes/user.routes"));
+//====================Auth=========================
+app.use("/api/auth", require("./routes/auth.routes"));
+// ==================== Audit Logs ====================
+app.use("/api/audit-logs", require("./routes/auditLog.routes"));
+// ==================== Roles ====================
 app.use("/api/roles", require("./routes/role.routes"));
-app.use("/api/visitors", require("./routes/visitor.routes"));
-app.use("/api/visit-requests", require("./routes/visitRequest.routes"));
-app.use("/api/meetings", require("./routes/meeting.routes"));
-app.use("/api/checkin", require("./routes/checkin.routes"));
-app.use("/api/checkout", require("./routes/checkout.routes"));
-app.use("/api/visitlogs", require("./routes/visitLog.routes"));
-app.use("/api/otp", require("./routes/otp.routes"));
-app.use("/api/qr", require("./routes/qr.routes"));
-app.use("/api/notifications", require("./routes/notification.routes"));
-app.use("/api/email-logs", require("./routes/emailLog.routes"));
-app.use("/api/sms-logs", require("./routes/smsLog.routes"));
-app.use("/api/reports", require("./routes/report.routes"));
-app.use("/api/settings", require("./routes/settings.routes"));
-app.use("/api/dashboard", require("./routes/dashboard.routes"));
-app.use("/api/documents", require("./routes/document.routes"));
-app.use("/api/auditlogs", require("./routes/auditLog.routes"));
 
+// ==================== Health Check ====================
 app.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
-    message: "Visitor Management System Backend Running"
+    message: "Visitor Management System Backend Running",
+    version: "1.0.0",
+  });
+});
+
+// ==================== 404 Handler ====================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+// ==================== Global Error Handler ====================
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
   });
 });
 

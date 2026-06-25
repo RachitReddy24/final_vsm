@@ -1,0 +1,229 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+enum UserRole {
+  ADMIN
+  RECEPTIONIST
+  HOST
+}
+
+enum VisitType {
+  PLANNED
+  UNPLANNED
+}
+
+enum VisitorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHECKED_IN
+  CHECKED_OUT
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  password      String
+  phone         String?
+  role          UserRole
+  isActive      Boolean        @default(true)
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  visitors      Visitor[]      @relation("HostVisitors")
+  meetings      Meeting[]      @relation("HostMeetings")
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Visitor {
+  id                  Int             @id @default(autoincrement())
+  name                String
+  mobileNumber        String
+  email               String?
+  purpose             String
+  cameFrom            String
+  photo               String?
+  idProof             String?
+  visitorCode         String          @unique
+
+  visitType           VisitType
+  status              VisitorStatus   @default(PENDING)
+
+  hostId              Int
+  host                User            @relation("HostVisitors", fields: [hostId], references: [id])
+
+  approvedAt          DateTime?
+  rejectedAt          DateTime?
+  checkedInAt         DateTime?
+  checkedOutAt        DateTime?
+
+  meetings            Meeting[]
+  checkIns            CheckIn[]
+  checkOuts           CheckOut[]
+  visitLogs           VisitLog[]
+  documents           VisitorDocument[]
+  otpRecords          OTP[]
+  qrCodes             QRCode[]
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+}
+
+model Meeting {
+  id                Int       @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor   @relation(fields: [visitorId], references: [id])
+
+  hostId            Int
+  host              User      @relation("HostMeetings", fields: [hostId], references: [id])
+
+  title             String?
+  description       String?
+  meetingDate       DateTime
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model CheckIn {
+  id                Int       @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor   @relation(fields: [visitorId], references: [id])
+
+  checkInTime       DateTime  @default(now())
+
+  createdAt         DateTime  @default(now())
+}
+
+model CheckOut {
+  id                Int       @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor   @relation(fields: [visitorId], references: [id])
+
+  checkOutTime      DateTime  @default(now())
+
+  createdAt         DateTime  @default(now())
+}
+
+model VisitLog {
+  id                Int            @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor        @relation(fields: [visitorId], references: [id])
+
+  action            String
+
+  createdAt         DateTime       @default(now())
+}
+
+model QRCode {
+  id                Int            @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor        @relation(fields: [visitorId], references: [id])
+
+  qrCode            String
+  isUsed            Boolean        @default(false)
+  expiryDate        DateTime
+
+  createdAt         DateTime       @default(now())
+}
+
+model OTP {
+  id                Int            @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor        @relation(fields: [visitorId], references: [id])
+
+  otp               String
+  isVerified        Boolean        @default(false)
+  expiresAt         DateTime
+
+  createdAt         DateTime       @default(now())
+}
+
+model Notification {
+  id                Int            @id @default(autoincrement())
+
+  userId            Int
+  user              User           @relation(fields: [userId], references: [id])
+
+  title             String
+  message           String
+  isRead            Boolean        @default(false)
+
+  createdAt         DateTime       @default(now())
+}
+
+model VisitorDocument {
+  id                Int            @id @default(autoincrement())
+
+  visitorId         Int
+  visitor           Visitor        @relation(fields: [visitorId], references: [id])
+
+  fileName          String
+  fileUrl           String
+  documentType      String
+
+  createdAt         DateTime       @default(now())
+}
+
+model EmailLog {
+  id                Int            @id @default(autoincrement())
+
+  recipient         String
+  subject           String
+  status            String
+
+  createdAt         DateTime       @default(now())
+}
+
+model SMSLog {
+  id                Int            @id @default(autoincrement())
+
+  mobile            String
+  message           String
+  status            String
+
+  createdAt         DateTime       @default(now())
+}
+
+model Setting {
+  id                Int            @id @default(autoincrement())
+
+  key               String         @unique
+  value             String
+  description       String?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model AuditLog {
+  id                Int            @id @default(autoincrement())
+
+  userId            Int
+  user              User           @relation(fields: [userId], references: [id])
+
+  module            String
+  action            String
+
+  createdAt         DateTime       @default(now())
+}
