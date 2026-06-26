@@ -134,16 +134,15 @@ model VisitLog {
 }
 
 model QRCode {
-  id                Int            @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  visitorId  Int
+  visitor    Visitor  @relation(fields: [visitorId], references: [id])
 
-  visitorId         Int
-  visitor           Visitor        @relation(fields: [visitorId], references: [id])
+  qrCode     String   @db.LongText
 
-  qrCode            String
-  isUsed            Boolean        @default(false)
-  expiryDate        DateTime
-
-  createdAt         DateTime       @default(now())
+  isUsed     Boolean  @default(false)
+  expiryDate DateTime
+  createdAt  DateTime @default(now())
 }
 
 model OTP {

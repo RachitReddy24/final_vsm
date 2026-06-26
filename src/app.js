@@ -14,7 +14,22 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/audit-logs", require("./routes/auditLog.routes"));
 // ==================== Roles ====================
 app.use("/api/roles", require("./routes/role.routes"));
-
+// ==================== Visitors ====================
+app.use("/api/visitors", require("./routes/visitor.routes"));
+// ==================== Meetings ====================
+app.use("/api/meetings", require("./routes/meeting.routes"));
+// ==================== Check-Ins ====================
+app.use("/api/checkins", require("./routes/checkin.routes"));
+// ==================== Check-Outs ====================
+app.use("/api/checkouts", require("./routes/checkout.routes"));
+// ==================== Visit Logs ====================
+app.use("/api/visitlogs", require("./routes/visitLog.routes"));
+//=======================otp=========================
+app.use("/api/otp", require("./routes/otp.routes"));
+// ==================== QR Codes ====================
+app.use("/api/qr", require("./routes/qr.routes"));
+// ==================== Notifications ====================
+app.use("/api/notifications", require("./routes/notification.routes"));
 // ==================== Health Check ====================
 app.get("/", (req, res) => {
   res.status(200).json({
