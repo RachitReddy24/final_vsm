@@ -1,0 +1,28 @@
+export const pendingApprovals = [
+  {
+    id: "VMS001",
+    visitorName: "Rahul Sharma",
+    company: "ABC Pvt Ltd",
+    email: "rahul@example.com",
+    mobile: "9876543210",
+    host: "John Doe",
+    department: "IT",
+    purpose: "Business Meeting",
+    visitDate: "18 Jul 2026",
+    visitTime: "10:30 AM",
+    status: "Pending",
+  },
+  {
+    id: "VMS002",
+    visitorName: "Priya Singh",
+    company: "XYZ Solutions",
+    email: "priya@example.com",
+    mobile: "9988776655",
+    host: "Jane Smith",
+    department: "HR",
+    purpose: "Interview",
+    visitDate: "18 Jul 2026",
+    visitTime: "11:00 AM",
+    status: "Pending",
+  },
+];

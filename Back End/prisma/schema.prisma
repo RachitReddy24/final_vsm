@@ -1,0 +1,321 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  HOST
+  RECEPTIONIST
+}
+
+enum VisitType {
+  PLANNED
+  WALK_IN
+}
+
+enum VisitorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHECKED_IN
+  CHECKED_OUT
+  COMPLETED
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+}
+
+enum EmailType {
+  BOOKING_URL
+  APPROVAL
+  REJECTION
+  VISITOR_ARRIVED
+  FEEDBACK
+  PASSWORD_RESET
+}
+
+model Department {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  description String?
+
+  users User[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  employeeId String @unique
+
+  name String
+
+  email String @unique
+
+  phone String?
+
+  password String
+
+  profileImage String?
+
+  role UserRole
+
+  isActive Boolean @default(true)
+
+  departmentId Int?
+
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  meetings Meeting[] @relation("HostMeetings")
+
+  visitors Visitor[]
+
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model Meeting {
+  id Int @id @default(autoincrement())
+
+  title String
+
+  description String?
+
+  meetingDate DateTime
+
+  bookingToken       String        @unique
+  bookingTokenExpiry DateTime?
+  status             MeetingStatus @default(SCHEDULED)
+
+  hostId Int
+
+  host User @relation("HostMeetings", fields: [hostId], references: [id])
+
+  visitor Visitor?
+
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model Visitor {
+  id Int @id @default(autoincrement())
+
+  meetingId Int? @unique
+
+  meeting Meeting? @relation(fields: [meetingId], references: [id])
+
+  hostId Int
+
+  host User @relation(fields: [hostId], references: [id])
+
+  visitorCode String @unique
+
+  name String
+
+  email String
+
+  mobileNumber String
+
+  company String?
+
+  designation String?
+
+  purpose String
+
+  cameFrom String?
+
+  visitType VisitType @default(PLANNED)
+
+  photo String?
+
+  idProof String?
+
+  status VisitorStatus @default(PENDING)
+
+  approvedAt DateTime?
+
+  checkedInAt DateTime?
+
+  checkedOutAt DateTime?
+
+  qrCode QRCode?
+
+  checkIn CheckIn?
+
+  checkOut CheckOut?
+
+  feedback Feedback?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model QRCode {
+  id Int @id @default(autoincrement())
+
+  visitorId Int @unique
+
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  qrImage String
+
+  isUsed Boolean @default(false)
+
+  expiryDate DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model OTP {
+  id Int @id @default(autoincrement())
+
+  mobileNumber String
+
+  otp String
+
+  verified Boolean @default(false)
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model CheckIn {
+  id Int @id @default(autoincrement())
+
+  visitorId Int @unique
+
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model CheckOut {
+  id Int @id @default(autoincrement())
+
+  visitorId Int @unique
+
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id Int @id @default(autoincrement())
+
+  visitorId Int @unique
+
+  visitor Visitor @relation(fields: [visitorId], references: [id])
+
+  rating Int @db.TinyInt
+
+  comments String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  title String
+
+  message String
+
+  status NotificationStatus @default(UNREAD)
+
+  createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id Int @id @default(autoincrement())
+
+  recipientName String
+
+  recipientEmail String
+
+  recipientType String
+
+  emailType EmailType
+
+  subject String
+
+  status EmailStatus
+
+  errorMessage String?
+
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id Int @id @default(autoincrement())
+
+  // Company
+  companyName String?
+  companyEmail String?
+  companyPhone String?
+  companyWebsite String?
+  companyAddress String?
+  companyLogo String?
+
+  // Visitor Security
+  otpLength Int? @default(6)
+  otpExpiry Int? @default(5)
+  maxVisitorsPerDay Int?
+
+  // QR
+  qrExpiryHours Int? @default(24)
+  badgeValidity String?
+  checkInGraceTime Int?
+
+  // Email
+  smtpEmail String?
+  smtpHost String?
+  smtpPort Int?
+
+  // SMS
+  smsProvider String?
+  senderId String?
+  smsApiKey String?
+
+  // Working Hours
+  officeStartTime String?
+  officeEndTime String?
+
+  updatedAt DateTime @updatedAt
+}

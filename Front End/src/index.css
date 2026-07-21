@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: Inter, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* Selection */
+
+::selection {
+  background: #2563eb;
+  color: white;
+}
+
+/* Inputs */
+
+input,
+select,
+textarea {
+  background: #1e293b;
+  color: white;
+  border: 1px solid #334155;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+/* Cards */
+
+.card-dark {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 20px;
+}
+
+/* Glass */
+
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(16px);
+}
