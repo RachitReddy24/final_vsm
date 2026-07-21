@@ -16,7 +16,7 @@ function DashboardLayout({ children }) {
     localStorage.getItem("userRole") || "Administrator";
 
   const menu =
-    role === "admin"
+    role === "ADMIN"
       ? adminMenu
       : receptionMenu;
 

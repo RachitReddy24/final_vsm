@@ -12,7 +12,6 @@ import {
   Clock3,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
-
 function Header({
   userName,
   userRole,

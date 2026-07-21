@@ -11,7 +11,6 @@ import {
 import { motion } from "framer-motion";
 import { useSidebar } from "../../hooks/useSidebar";
 import useAuth from "../../hooks/useAuth";
-
 function Sidebar({
   menu = [],
   userName,
