@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import api from "../../services/api";
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
@@ -35,7 +35,10 @@ function VisitorOnboarding() {
     time: "",
     duration: "",
   });
-
+const [otp, setOtp] = useState("");
+const [otpSent, setOtpSent] = useState(false);
+const [otpVerified, setOtpVerified] = useState(false);
+const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -49,11 +52,27 @@ function VisitorOnboarding() {
     );
   };
 
-  const handleShare = () => {
-    alert(
-      "Visitor Registration URL shared successfully."
-    );
-  };
+ const handleSendOTP = async () => {
+  if (!formData.mobile) {
+    alert("Please enter mobile number");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    await api.post("/otp/send", {
+      mobileNumber: formData.mobile,
+    });
+
+    setOtpSent(true);
+    alert("OTP sent successfully.");
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSubmit = () => {
 
@@ -281,11 +300,11 @@ function VisitorOnboarding() {
 
             <button
               type="button"
-              onClick={handleShare}
+              onClick={handleSendOTP}
               className="flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-sky-600 text-white py-4 font-semibold shadow-lg hover:scale-105 transition"
             >
               <Send size={22} />
-              Share Registration URL
+              Send OTP
             </button>
 
             <button

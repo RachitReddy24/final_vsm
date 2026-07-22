@@ -119,6 +119,22 @@ const getVisitorStatusReport = async (req, res) => {
     });
   }
 };
+const getRecentActivity = async (req, res) => {
+  try {
+    const activities = await reportService.getRecentActivityReport();
+
+    res.status(200).json({
+      success: true,
+      data: activities,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getVisitorReport,
   getMeetingReport,
@@ -127,6 +143,7 @@ module.exports = {
   getReportSummary,
   getMonthlyVisitorReport,
   getVisitorStatusReport,
-    exportReport,
+  exportReport,
+  getRecentActivity,
 };
   

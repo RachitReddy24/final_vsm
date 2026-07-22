@@ -52,6 +52,13 @@ function EditUserModal({
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
+        
+         <Input
+          label="Employee ID"
+          name="employeeId"
+          value={form.employeeId || ""}
+          onChange={handleChange}
+          />
 
           <Input
             label="Full Name"
@@ -73,11 +80,23 @@ function EditUserModal({
             value={form.phone || ""}
             onChange={handleChange}
           />
+         
+          <Select
+           label="Role"
+           name="role"
+          value={form.role || ""}
+          onChange={handleChange}
+          options={[
+          "ADMIN",
+          "RECEPTIONIST",
+          "HOST",
+          ]}
+         />
 
           <Input
-            label="Department"
-            name="department"
-            value={form.department || ""}
+            label="Department ID"
+            name="departmentId"
+            value={form.departmentId || ""}
             onChange={handleChange}
           />
 
@@ -138,5 +157,44 @@ function Input({
     </div>
   );
 }
+function Select({
+  label,
+  options,
+  ...props
+}) {
+  return (
+    <div>
+      <label className="block mb-2 text-slate-300">
+        {label}
+      </label>
 
+      <select
+        {...props}
+        className="
+        w-full
+        rounded-xl
+        bg-slate-800
+        border
+        border-slate-700
+        px-4
+        py-3
+        text-white
+        "
+      >
+        <option value="">
+          Select
+        </option>
+
+        {options.map((option) => (
+          <option
+            key={option}
+            value={option}
+          >
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 export default EditUserModal;

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AddDepartmentModal from "./AddDepartmentModal";
+import api from "../../services/api";
 import {
   Building2,
   Search,
@@ -7,44 +9,41 @@ import {
   Trash2,
 } from "lucide-react";
 
-const initialDepartments = [
-  {
-    id: 1,
-    name: "Information Technology",
-    code: "IT",
-    head: "John Doe",
-    employees: 32,
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Human Resources",
-    code: "HR",
-    head: "Rukmini",
-    employees: 12,
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Finance",
-    code: "FIN",
-    head: "Rahul Sharma",
-    employees: 15,
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Administration",
-    code: "ADMIN",
-    head: "Rachit Reddy",
-    employees: 8,
-    status: "Active",
-  },
-];
+
 
 function DepartmentTable() {
-  const [departments] = useState(initialDepartments);
+const [departments, setDepartments] = useState([]);
 
+const [openAdd, setOpenAdd] = useState(false);
+useEffect(() => {
+  fetchDepartments();
+}, []);
+
+const fetchDepartments = async () => {
+  try {
+    const response = await api.get("/departments");
+
+    console.log("Full Response:", response.data);
+
+    setDepartments(response.data.data.departments);
+  } catch (error) {
+    console.error(error);
+  }
+};
+const addDepartment = async (department) => {
+  try {
+    await api.post("/departments", department);
+
+    alert("Department added successfully");
+
+    setOpenAdd(false);
+
+    fetchDepartments();
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to add department");
+  }
+};
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
@@ -64,8 +63,10 @@ function DepartmentTable() {
 
         </div>
 
-        <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:scale-105 transition">
-
+<button
+  onClick={() => setOpenAdd(true)}
+  className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:scale-105 transition"
+>
           <Plus size={20} />
 
           Add Department
@@ -100,131 +101,73 @@ function DepartmentTable() {
 
       </div>
 
+      <AddDepartmentModal
+  open={openAdd}
+  onClose={() => setOpenAdd(false)}
+  onSave={addDepartment}
+/>
+
       {/* Table */}
 
       <div className="overflow-x-auto">
 
         <table className="w-full">
 
-          <thead>
+<thead>
+  <tr className="border-b border-slate-700">
+    <th className="text-left py-4 text-slate-400">Department</th>
+    <th className="text-left text-slate-400">Description</th>
+    <th className="text-left text-slate-400">Status</th>
+    <th className="text-center text-slate-400">Actions</th>
+  </tr>
+</thead>
 
-            <tr className="border-b border-slate-700">
+         <tbody>
+  {departments.map((dept) => (
+    <tr
+      key={dept.id}
+      className="border-b border-slate-800 hover:bg-slate-800/40 transition"
+    >
+      <td className="py-5">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+            <Building2 className="text-cyan-400" />
+          </div>
 
-              <th className="text-left py-4 text-slate-400">
-                Department
-              </th>
+          <span className="text-white font-semibold">
+            {dept.name}
+          </span>
+        </div>
+      </td>
 
-              <th className="text-left text-slate-400">
-                Code
-              </th>
+      <td className="text-slate-300">
+        {dept.description}
+      </td>
 
-              <th className="text-left text-slate-400">
-                Department Head
-              </th>
+      <td>
+        <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400">
+          Active
+        </span>
+      </td>
 
-              <th className="text-left text-slate-400">
-                Employees
-              </th>
+      <td>
+        <div className="flex justify-center gap-3">
+          <button className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700">
+            <Edit size={18} className="text-white" />
+          </button>
 
-              <th className="text-left text-slate-400">
-                Status
-              </th>
-
-              <th className="text-center text-slate-400">
-                Actions
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {departments.map((dept) => (
-
-              <tr
-                key={dept.id}
-                className="border-b border-slate-800 hover:bg-slate-800/40 transition"
-              >
-
-                <td className="py-5">
-
-                  <div className="flex items-center gap-3">
-
-                    <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center">
-
-                      <Building2 className="text-cyan-400" />
-
-                    </div>
-
-                    <span className="text-white font-semibold">
-                      {dept.name}
-                    </span>
-
-                  </div>
-
-                </td>
-
-                <td className="text-cyan-400 font-semibold">
-                  {dept.code}
-                </td>
-
-                <td className="text-slate-300">
-                  {dept.head}
-                </td>
-
-                <td className="text-slate-300">
-                  {dept.employees}
-                </td>
-
-                <td>
-
-                  <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400">
-
-                    {dept.status}
-
-                  </span>
-
-                </td>
-
-                <td>
-
-                  <div className="flex justify-center gap-3">
-
-                    <button className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700">
-
-                      <Edit
-                        size={18}
-                        className="text-white"
-                      />
-
-                    </button>
-
-                    <button className="p-2 rounded-lg bg-red-600 hover:bg-red-700">
-
-                      <Trash2
-                        size={18}
-                        className="text-white"
-                      />
-
-                    </button>
-
-                  </div>
-
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-  );
+          <button className="p-2 rounded-lg bg-red-600 hover:bg-red-700">
+            <Trash2 size={18} className="text-white" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+</table>
+</div>
+</div>
+);
 }
 
 export default DepartmentTable;

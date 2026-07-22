@@ -1,3 +1,4 @@
+console.log("__dirname =", __dirname);
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -8,8 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the 'uploads' directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../uploads"))
+);
 app.get("/", (req, res) => {
   res.json({
     success: true,

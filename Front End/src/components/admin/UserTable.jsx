@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Search,
   UserPlus,
@@ -12,75 +13,70 @@ import AddUserModal from "../dashboard/AddUserModal";
 import EditUserModal from "../dashboard/EditUserModal";
 import DeleteUserModal from "../dashboard/DeleteUserModal";
 
-const initialUsers = [
-  {
-    id: 1,
-    name: "Rachit Reddy",
-    email: "rachit@s3dtech.com",
-    phone: "9059631379",
-    role: "Admin",
-    department: "Administration",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Rukmini",
-    email: "rukmini@s3dtech.com",
-    phone: "6300450242",
-    role: "Reception",
-    department: "Reception",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "John Doe",
-    email: "john@s3dtech.com",
-    phone: "9876543210",
-    role: "Host",
-    department: "IT",
-    status: "Inactive",
-  },
-];
+
 
 function UserTable() {
-  const [users, setUsers] = useState(initialUsers);
-
+const [users, setUsers] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
+useEffect(() => {
+  fetchUsers();
+}, []);
 
-  const addUser = (newUser) => {
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...newUser,
-        status: "Active",
-      },
-    ]);
+const fetchUsers = async () => {
+  try {
+    const response = await api.get("/users");
+console.log(response.data);
+    setUsers(response.data.data);
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    alert(error.response?.data?.message || "Failed to fetch users");
+  }
+};
+const addUser = async (newUser) => {
+  try {
+    await api.post("/users", newUser);
+
+    alert("User created successfully");
 
     setOpenAdd(false);
-  };
 
-  const updateUser = (updatedUser) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      )
-    );
+    fetchUsers();
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to create user");
+  }
+};
+
+const updateUser = async (updatedUser) => {
+  try {
+    await api.put(`/users/${updatedUser.id}`, updatedUser);
+
+    alert("User updated successfully");
 
     setOpenEdit(false);
-  };
 
-  const deleteUser = (id) => {
-    setUsers((prev) =>
-      prev.filter((user) => user.id !== id)
-    );
+    fetchUsers();
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to update user");
+  }
+};
+
+const deleteUser = async (id) => {
+  try {
+    await api.delete(`/users/${id}`);
+
+    alert("User deleted successfully");
 
     setOpenDelete(false);
-  };
+
+    fetchUsers();
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to delete user");
+  }
+};
 
   return (
     <>
@@ -203,13 +199,13 @@ function UserTable() {
 
                   </td>
 
-                  <td className="text-slate-300">
-                    {user.department}
-                  </td>
+                     <td className="text-slate-300">
+                    {user.department?.name || "-"}
+                      </td>
 
                   <td>
 
-                    {user.status === "Active" ? (
+                    {user.isActive ? (
 
                       <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400">
 

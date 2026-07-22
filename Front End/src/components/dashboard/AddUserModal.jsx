@@ -7,14 +7,14 @@ function AddUserModal({
   onSave,
 }) {
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role: "",
-    department: "",
-    password: "",
-  });
-
+  employeeId: "",
+  name: "",
+  email: "",
+  phone: "",
+  role: "",
+  departmentId: "",
+  password: "",
+});
   if (!open) return null;
 
   const handleChange = (e) => {
@@ -27,14 +27,15 @@ function AddUserModal({
   const submit = () => {
     onSave(form);
 
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      role: "",
-      department: "",
-      password: "",
-    });
+setForm({
+  employeeId: "",
+  name: "",
+  email: "",
+  phone: "",
+  role: "",
+  departmentId: "",
+  password: "",
+});
   };
 
   return (
@@ -71,6 +72,13 @@ function AddUserModal({
 
         <div className="grid md:grid-cols-2 gap-6">
 
+         <Input
+           label="Employee ID"
+           name="employeeId"
+           value={form.employeeId}
+           onChange={handleChange}
+          />
+        
           <Input
             label="Full Name"
             name="name"
@@ -98,17 +106,17 @@ function AddUserModal({
             value={form.role}
             onChange={handleChange}
             options={[
-              "Admin",
-              "Reception",
-              "Host",
+               "ADMIN",
+              "RECEPTION",
+              "HOST",
             ]}
           />
 
           <Input
-            label="Department"
-            name="department"
-            value={form.department}
-            onChange={handleChange}
+          label="Department ID"
+          name="departmentId"
+          value={form.departmentId}
+          onChange={handleChange}
           />
 
           <Input

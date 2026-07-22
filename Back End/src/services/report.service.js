@@ -224,6 +224,31 @@ const getVisitorStatusReport = async () => {
   return result;
 
 };
+const getRecentActivityReport = async () => {
+  const visitors = await prisma.visitor.findMany({
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: 10,
+    include: {
+      host: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return visitors.map((visitor) => ({
+    id: visitor.id,
+    title: `${visitor.name} - ${visitor.status}`,
+    description: visitor.host
+      ? `Host: ${visitor.host.name}`
+      : "No host assigned",
+    status: visitor.status,
+    time: visitor.updatedAt,
+  }));
+};
 
 module.exports = {
   getVisitorReport,
@@ -234,5 +259,6 @@ module.exports = {
   getMonthlyVisitorReport,
   getVisitorStatusReport,
   exportReport,
+  getRecentActivityReport,
 };
   

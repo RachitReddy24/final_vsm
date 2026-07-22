@@ -23,8 +23,10 @@ const getSettings = async (req, res) => {
 };
 
 const updateSettings = async (req, res) => {
-
   try {
+    if (req.file) {
+      req.body.companyLogo = req.file.filename;
+    }
 
     const settings = await settingsService.updateSettings(req.body);
 
@@ -33,18 +35,13 @@ const updateSettings = async (req, res) => {
       message: "Settings updated successfully",
       data: settings,
     });
-
   } catch (error) {
-
     res.status(400).json({
       success: false,
       message: error.message,
     });
-
   }
-
 };
-
 module.exports = {
   getSettings,
   updateSettings,

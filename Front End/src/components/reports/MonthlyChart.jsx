@@ -14,8 +14,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 
-import { monthlyVisitors } from "../../data/reportData";
-
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 const colors = [
   "#3B82F6",
   "#06B6D4",
@@ -32,6 +32,19 @@ const colors = [
 ];
 
 function MonthlyChart() {
+  const [monthlyVisitors, setMonthlyVisitors] = useState([]);
+  useEffect(() => {
+  fetchMonthlyVisitors();
+}, []);
+
+const fetchMonthlyVisitors = async () => {
+  try {
+    const response = await api.get("/reports/monthly");
+    setMonthlyVisitors(response.data.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
 

@@ -60,4 +60,10 @@ router.get(
   authorize("ADMIN"),
   reportController.getVisitorStatusReport
 );
+router.get(
+  "/activity",
+  authenticate,
+  authorize("ADMIN"),
+  reportController.getRecentActivity
+);
 module.exports = router;

@@ -1,6 +1,5 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcrypt");
-
 // Create Employee
 const createEmployee = async (data) => {
   // Check duplicate email
@@ -70,24 +69,26 @@ const getAllEmployees = async ({
   limit = Number(limit);
 
   const where = {
-    OR: [
-      {
-        name: {
-          contains: search,
-        },
+  role: "HOST",
+
+  OR: [
+    {
+      name: {
+        contains: search,
       },
-      {
-        email: {
-          contains: search,
-        },
+    },
+    {
+      email: {
+        contains: search,
       },
-      {
-        employeeId: {
-          contains: search,
-        },
+    },
+    {
+      employeeId: {
+        contains: search,
       },
-    ],
-  };
+    },
+  ],
+};
 
   const employees = await prisma.user.findMany({
     where,

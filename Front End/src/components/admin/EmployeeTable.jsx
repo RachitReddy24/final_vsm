@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AddEmployeeModal from "./AddEmployeeModal";
+import api from "../../services/api";
 import {
   Search,
   Plus,
@@ -9,42 +11,39 @@ import {
   Phone,
 } from "lucide-react";
 
-const initialEmployees = [
-  {
-    id: 1,
-    employeeId: "EMP001",
-    name: "John Doe",
-    department: "IT",
-    designation: "Software Engineer",
-    email: "john@s3dtech.com",
-    phone: "9876543210",
-    status: "Active",
-  },
-  {
-    id: 2,
-    employeeId: "EMP002",
-    name: "David Smith",
-    department: "Finance",
-    designation: "Manager",
-    email: "david@s3dtech.com",
-    phone: "9876543211",
-    status: "Active",
-  },
-  {
-    id: 3,
-    employeeId: "EMP003",
-    name: "Anita Sharma",
-    department: "HR",
-    designation: "HR Executive",
-    email: "anita@s3dtech.com",
-    phone: "9876543212",
-    status: "Inactive",
-  },
-];
+
 
 function EmployeeTable() {
-  const [employees] = useState(initialEmployees);
+const [employees, setEmployees] = useState([]);
+const [openAdd, setOpenAdd] = useState(false);
+useEffect(() => {
+  fetchEmployees();
+}, []);
 
+const fetchEmployees = async () => {
+  try {
+    const response = await api.get("/employees");
+
+    setEmployees(response.data.data.employees);
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to fetch employees");
+  }
+};
+const addEmployee = async (employee) => {
+  try {
+    await api.post("/employees", employee);
+
+    alert("Employee added successfully");
+
+    setOpenAdd(false);
+
+    fetchEmployees();
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to add employee");
+  }
+};
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
@@ -61,11 +60,17 @@ function EmployeeTable() {
           <p className="text-slate-400 mt-2">
             Manage employees and meeting hosts.
           </p>
-
+<AddEmployeeModal
+  open={openAdd}
+  onClose={() => setOpenAdd(false)}
+  onSave={addEmployee}
+/>
         </div>
 
-        <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white">
-
+<button
+  onClick={() => setOpenAdd(true)}
+  className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white"
+>
           <Plus size={20} />
 
           Add Employee
@@ -160,11 +165,11 @@ function EmployeeTable() {
                 </td>
 
                 <td className="text-slate-300">
-                  {employee.department}
+                  {employee.department?.name || "-"}
                 </td>
 
                 <td className="text-slate-300">
-                  {employee.designation}
+                  {employee.role || "-"}
                 </td>
 
                 <td>
@@ -193,7 +198,7 @@ function EmployeeTable() {
 
                 <td>
 
-                  {employee.status === "Active" ? (
+                  {employee.isActive ? (
 
                     <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400">
                       Active

@@ -82,7 +82,7 @@ function DeleteUserModal({
 
             <p className="text-slate-300">
               <span className="text-slate-400">Department :</span>{" "}
-              {user.department}
+              {user.department?.name || "-"}
             </p>
 
           </div>

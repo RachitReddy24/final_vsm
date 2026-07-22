@@ -2,7 +2,8 @@ import DashboardLayout from "../../layouts/roles/DashboardLayout";
 import MonthlyChart from "../../components/reports/MonthlyChart";
 import StatusChart from "../../components/reports/StatusChart";
 import ActivityTimeline from "../../components/reports/ActivityTimeline";
-
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Download,
   CalendarDays,
@@ -13,6 +14,27 @@ import {
 } from "lucide-react";
 
 function Reports() {
+  const [summary, setSummary] = useState({
+  totalVisitors: 0,
+  todayVisitors: 0,
+  approvedVisitors: 0,
+  checkedInVisitors: 0,
+  checkedOutVisitors: 0,
+  feedbackCount: 0,
+  totalMeetings: 0,
+});
+useEffect(() => {
+  fetchSummary();
+}, []);
+
+const fetchSummary = async () => {
+  try {
+    const response = await api.get("/reports/summary");
+    setSummary(response.data.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <DashboardLayout>
 
@@ -68,28 +90,28 @@ function Reports() {
 
           <StatCard
             title="Total Visitors"
-            value="4,285"
+            value={summary.totalVisitors}
             icon={<Users size={28} />}
             color="from-blue-600 to-cyan-500"
           />
 
           <StatCard
             title="Today's Visits"
-            value="125"
+            value={summary.todayVisitors}
             icon={<CalendarDays size={28} />}
             color="from-green-600 to-emerald-500"
           />
 
           <StatCard
             title="Approval Rate"
-            value="97%"
+            value={summary.approvedVisitors}
             icon={<ShieldCheck size={28} />}
             color="from-purple-600 to-violet-500"
           />
 
           <StatCard
             title="Average Duration"
-            value="42 min"
+            value={summary.totalMeetings}
             icon={<Clock3 size={28} />}
             color="from-orange-500 to-yellow-500"
           />

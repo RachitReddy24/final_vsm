@@ -14,8 +14,8 @@ import {
   XCircle,
 } from "lucide-react";
 
-import { statusData } from "../../data/reportData";
-
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 const COLORS = [
   "#22C55E",
   "#F59E0B",
@@ -31,6 +31,25 @@ const ICONS = [
 ];
 
 function StatusChart() {
+  const [statusData, setStatusData] = useState([]);
+  useEffect(() => {
+  fetchStatusData();
+}, []);
+
+const fetchStatusData = async () => {
+  try {
+    const response = await api.get("/reports/status");
+
+    const formattedData = response.data.data.map((item) => ({
+      name: item.status,
+      value: item._count.id,
+    }));
+
+    setStatusData(formattedData);
+  } catch (error) {
+    console.error(error);
+  }
+};
   const total = statusData.reduce(
     (sum, item) => sum + item.value,
     0

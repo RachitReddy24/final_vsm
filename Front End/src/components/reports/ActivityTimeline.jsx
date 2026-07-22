@@ -6,9 +6,24 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import { activities } from "../../data/reportData";
-
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 function ActivityTimeline() {
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await api.get("/reports/activity");
+        setActivities(response.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
   const getIcon = (id) => {
     switch (id % 5) {
       case 0:
@@ -68,7 +83,7 @@ function ActivityTimeline() {
 
       <div className="p-6 space-y-6">
 
-        {activities.map((item) => (
+        {activities.map((item, index) => (
 
           <div
             key={item.id}
@@ -87,9 +102,9 @@ function ActivityTimeline() {
                 {getIcon(item.id)}
               </div>
 
-              {item.id !== activities.length && (
-                <div className="absolute left-1/2 top-14 w-[2px] h-10 -translate-x-1/2 bg-slate-700"></div>
-              )}
+          {index !== activities.length - 1 && (
+            <div className="absolute left-1/2 top-14 w-[2px] h-10 -translate-x-1/2 bg-slate-700"></div>
+             )}
 
             </div>
 
@@ -105,15 +120,14 @@ function ActivityTimeline() {
                     {item.title}
                   </h3>
 
-                  <p className="text-slate-400 mt-2">
-                    Visitor Management System Activity
-                  </p>
-
+                 <p className="text-slate-400 mt-2">
+                {item.description}
+               </p>
                 </div>
 
-                <span className="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-xs">
-                  {item.time}
-                </span>
+               <span className="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-xs">
+              {new Date(item.time).toLocaleString()}
+              </span>
 
               </div>
 

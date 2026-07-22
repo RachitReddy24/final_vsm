@@ -1,4 +1,6 @@
 import DashboardLayout from "../../layouts/roles/DashboardLayout";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Building2,
   ShieldCheck,
@@ -11,6 +13,83 @@ import {
 } from "lucide-react";
 
 function Settings() {
+  const [settings, setSettings] = useState({
+  companyName: "",
+  companyEmail: "",
+  companyPhone: "",
+  companyWebsite: "",
+  companyAddress: "",
+  companyLogo: "",
+
+  otpLength: "",
+  otpExpiry: "",
+  maxVisitorsPerDay: "",
+
+  qrExpiryHours: "",
+  badgeValidity: "",
+  checkInGraceTime: "",
+
+  smtpEmail: "",
+  smtpHost: "",
+  smtpPort: "",
+
+  smsProvider: "",
+  senderId: "",
+  smsApiKey: "",
+
+  officeStartTime: "",
+  officeEndTime: "",
+});
+const [logo, setLogo] = useState(null);
+useEffect(() => {
+  fetchSettings();
+}, []);
+
+const fetchSettings = async () => {
+  try {
+    const response = await api.get("/settings");
+    setSettings(response.data.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+const saveSettings = async () => {
+  try {
+    const formData = new FormData();
+
+    Object.keys(settings).forEach((key) => {
+      formData.append(key, settings[key] ?? "");
+    });
+
+    if (logo) {
+      formData.append("companyLogo", logo);
+    }
+
+    await api.put("/settings", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    alert("Settings updated successfully");
+
+    fetchSettings();
+  } catch (error) {
+  console.error(error.response?.data);
+  alert(error.response?.data?.message || "Failed to update settings");
+}
+};
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setSettings((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+const handleLogoChange = (e) => {
+  setLogo(e.target.files[0]);
+};
   return (
     <DashboardLayout>
 
@@ -33,6 +112,7 @@ function Settings() {
           </div>
 
           <button
+            onClick={saveSettings}
             className="
             mt-5 lg:mt-0
             flex
@@ -73,25 +153,37 @@ function Settings() {
 
           <div className="grid md:grid-cols-2 gap-6">
 
-            <Input
-              label="Company Name"
-              placeholder="S3D Technologies Pvt. Ltd."
-            />
+<Input
+  label="Company Name"
+  name="companyName"
+  value={settings.companyName}
+  onChange={handleChange}
+  placeholder="S3D Technologies Pvt. Ltd."
+/>
 
             <Input
-              label="Company Email"
-              placeholder="support@s3dtechnologies.com"
-            />
+  label="Company Email"
+  name="companyEmail"
+  value={settings.companyEmail}
+  onChange={handleChange}
+  placeholder="support@s3dtechnologies.com"
+/>
 
             <Input
-              label="Phone Number"
-              placeholder="+91 XXXXX XXXXX"
-            />
+  label="Phone Number"
+  name="companyPhone"
+  value={settings.companyPhone}
+  onChange={handleChange}
+  placeholder="+91 XXXXX XXXXX"
+/>
 
-            <Input
-              label="Website"
-              placeholder="www.s3dtechnologies.com"
-            />
+           <Input
+  label="Website"
+  name="companyWebsite"
+  value={settings.companyWebsite}
+  onChange={handleChange}
+  placeholder="www.s3dtechnologies.com"
+/>
 
             <div className="md:col-span-2">
 
@@ -100,20 +192,23 @@ function Settings() {
               </label>
 
               <textarea
-                rows={4}
-                className="
-                w-full
-                bg-slate-800
-                border
-                border-slate-700
-                rounded-2xl
-                p-4
-                text-white
-                outline-none
-                focus:border-cyan-500
-                "
-                placeholder="Company Address..."
-              />
+  rows={4}
+  name="companyAddress"
+  value={settings.companyAddress}
+  onChange={handleChange}
+  className="
+    w-full
+    bg-slate-800
+    border
+    border-slate-700
+    rounded-2xl
+    p-4
+    text-white
+    outline-none
+    focus:border-cyan-500
+  "
+  placeholder="Company Address..."
+/>
 
             </div>
 
@@ -140,20 +235,27 @@ function Settings() {
             <div className="space-y-5">
 
               <Input
-                label="OTP Length"
-                placeholder="6"
-              />
-
+  label="OTP Length"
+  name="otpLength"
+  value={settings.otpLength}
+  onChange={handleChange}
+  placeholder="6"
+/>
               <Input
-                label="OTP Expiry (Minutes)"
-                placeholder="10"
-              />
+  label="OTP Expiry (Minutes)"
+  name="otpExpiry"
+  value={settings.otpExpiry}
+  onChange={handleChange}
+  placeholder="10"
+/>
 
-              <Input
-                label="Maximum Visitors Per Day"
-                placeholder="500"
-              />
-
+<Input
+  label="Maximum Visitors Per Day"
+  name="maxVisitorsPerDay"
+  value={settings.maxVisitorsPerDay}
+  onChange={handleChange}
+  placeholder="500"
+/>
             </div>
 
           </div>
@@ -172,20 +274,29 @@ function Settings() {
 
             <div className="space-y-5">
 
-              <Input
-                label="QR Expiry"
-                placeholder="24 Hours"
-              />
+             <Input
+  label="QR Expiry"
+  name="qrExpiryHours"
+  value={settings.qrExpiryHours}
+  onChange={handleChange}
+  placeholder="24 Hours"
+/>
 
               <Input
-                label="Badge Validity"
-                placeholder="Same Day"
-              />
+  label="Badge Validity"
+  name="badgeValidity"
+  value={settings.badgeValidity}
+  onChange={handleChange}
+  placeholder="Same Day"
+/>
 
-              <Input
-                label="Check-In Grace Time"
-                placeholder="30 Minutes"
-              />
+    <Input
+  label="Check-In Grace Time"
+  name="checkInGraceTime"
+  value={settings.checkInGraceTime}
+  onChange={handleChange}
+  placeholder="30 Minutes"
+/>
 
             </div>
 
@@ -212,19 +323,28 @@ function Settings() {
             <div className="space-y-5">
 
               <Input
-                label="SMTP Email"
-                placeholder="support@company.com"
-              />
+  label="SMTP Email"
+  name="smtpEmail"
+  value={settings.smtpEmail}
+  onChange={handleChange}
+  placeholder="support@company.com"
+/>
 
               <Input
-                label="SMTP Host"
-                placeholder="smtp.gmail.com"
-              />
+  label="SMTP Host"
+  name="smtpHost"
+  value={settings.smtpHost}
+  onChange={handleChange}
+  placeholder="smtp.gmail.com"
+/>
 
               <Input
-                label="SMTP Port"
-                placeholder="587"
-              />
+  label="SMTP Port"
+  name="smtpPort"
+  value={settings.smtpPort}
+  onChange={handleChange}
+  placeholder="587"
+/>
 
             </div>
 
@@ -245,19 +365,28 @@ function Settings() {
             <div className="space-y-5">
 
               <Input
-                label="SMS Provider"
-                placeholder="Twilio"
-              />
+  label="SMS Provider"
+  name="smsProvider"
+  value={settings.smsProvider}
+  onChange={handleChange}
+  placeholder="Twilio"
+/>
 
               <Input
-                label="Sender ID"
-                placeholder="VMS"
-              />
+  label="Sender ID"
+  name="senderId"
+  value={settings.senderId}
+  onChange={handleChange}
+  placeholder="VMS"
+/>
 
               <Input
-                label="API Key"
-                placeholder="********"
-              />
+  label="API Key"
+  name="smsApiKey"
+  value={settings.smsApiKey}
+  onChange={handleChange}
+  placeholder="********"
+/>
 
             </div>
 
@@ -281,16 +410,21 @@ function Settings() {
 
           <div className="grid md:grid-cols-2 gap-6">
 
-            <Input
-              label="Opening Time"
-              placeholder="09:00 AM"
-            />
+           <Input
+  label="Opening Time"
+  name="officeStartTime"
+  value={settings.officeStartTime}
+  onChange={handleChange}
+  placeholder="09:00 AM"
+/>
 
-            <Input
-              label="Closing Time"
-              placeholder="06:00 PM"
-            />
-
+  <Input
+  label="Closing Time"
+  name="officeEndTime"
+  value={settings.officeEndTime}
+  onChange={handleChange}
+  placeholder="06:00 PM"
+/>
           </div>
 
         </div>
@@ -309,18 +443,47 @@ function Settings() {
 
           </div>
 
-          <div className="border-2 border-dashed border-slate-700 rounded-3xl h-52 flex flex-col justify-center items-center">
+          <div className="border-2 border-dashed border-slate-700 rounded-3xl p-8 flex flex-col items-center">
 
-            <Upload
-              size={50}
-              className="text-slate-500"
-            />
+  <Upload
+    size={50}
+    className="text-slate-500 mb-4"
+  />
 
-            <p className="text-slate-400 mt-4">
-              Upload Company Logo
-            </p>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleLogoChange}
+    className="text-white"
+  />
 
-          </div>
+  {logo && (
+    <p className="text-green-400 mt-4">
+      {logo.name}
+    </p>
+  )}
+  <p className="text-yellow-400 mt-2">
+  DB Logo: {settings.companyLogo || "No logo"}
+</p>
+{settings.companyLogo && (
+<img
+  src={`http://localhost:5000/uploads/logos/${settings.companyLogo}?t=${Date.now()}`}
+  alt="Company Logo"
+  style={{
+    width: "150px",
+    height: "150px",
+    border: "2px solid red",
+    objectFit: "contain",
+    backgroundColor: "white",
+  }}
+  onLoad={() => console.log("Image Loaded")}
+  onError={(e) => {
+    console.log("Image Failed");
+    console.log(e.target.src);
+  }}
+/>
+)}
+</div>
 
         </div>
 
@@ -330,32 +493,34 @@ function Settings() {
   );
 }
 
-function Input({ label, placeholder }) {
+function Input({ label, name, value, onChange, placeholder }) {
   return (
     <div>
-
       <label className="block text-slate-300 mb-3">
         {label}
       </label>
 
       <input
+        name={name}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
         className="
-        w-full
-        bg-slate-800
-        border
-        border-slate-700
-        rounded-2xl
-        px-5
-        py-4
-        text-white
-        outline-none
-        focus:border-cyan-500
+          w-full
+          bg-slate-800
+          border
+          border-slate-700
+          rounded-2xl
+          px-5
+          py-4
+          text-white
+          outline-none
+          focus:border-cyan-500
         "
       />
-
     </div>
   );
 }
+
 
 export default Settings;
