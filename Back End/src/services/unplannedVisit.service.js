@@ -38,6 +38,8 @@ const createUnplannedVisit = async (data) => {
   data.photo,
   visitorCode
 );
+const approvalToken = crypto.randomBytes(32).toString("hex");
+const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
 const otpRecord = await prisma.oTP.findFirst({
   where: {
@@ -56,7 +58,8 @@ if (!otpRecord) {
   const visitor = await prisma.visitor.create({
     data: {
       visitorCode,
-
+      approvalToken,
+      tokenExpiry,
       hostId: host.id,
 
       meetingId: null,
@@ -82,6 +85,7 @@ if (!otpRecord) {
       visitType: "WALK_IN",
 
       status: "PENDING",
+      
     },
       
     include: {
@@ -100,7 +104,9 @@ if (!otpRecord) {
     title: "Walk-in Visitor",
     message: `${visitor.name} is waiting for your approval.`,
   });
+const approveUrl = `${process.env.BASE_URL}/api/host/approve/${approvalToken}`;
 
+const rejectUrl = `${process.env.BASE_URL}/api/host/reject/${approvalToken}`;
   // Email
   try {
 
@@ -109,15 +115,54 @@ if (!otpRecord) {
       to: host.email,
       subject: "Walk-in Visitor Waiting",
 
-      html: `
-        <h2>Walk-in Visitor</h2>
+html: `
+<h2>Walk-in Visitor Approval Request</h2>
 
-        <p>${visitor.name} is waiting at reception.</p>
+<p>Hello <b>${host.name}</b>,</p>
 
-        <p><b>Company:</b> ${visitor.company}</p>
+<p>A walk-in visitor is waiting for your approval.</p>
 
-        <p><b>Purpose:</b> ${visitor.purpose}</p>
-      `,
+<hr>
+
+<p><b>Visitor Name:</b> ${visitor.name}</p>
+
+<p><b>Company:</b> ${visitor.company || "N/A"}</p>
+
+<p><b>Purpose:</b> ${visitor.purpose}</p>
+
+<p><b>Mobile:</b> ${visitor.mobileNumber}</p>
+
+<br>
+
+<a href="${approveUrl}"
+style="
+background:#16a34a;
+color:white;
+padding:12px 20px;
+text-decoration:none;
+border-radius:6px;
+margin-right:10px;
+display:inline-block;
+">
+Approve
+</a>
+
+<a href="${rejectUrl}"
+style="
+background:#dc2626;
+color:white;
+padding:12px 20px;
+text-decoration:none;
+border-radius:6px;
+display:inline-block;
+">
+Reject
+</a>
+
+<br><br>
+
+<p>This approval link is valid for 24 hours.</p>
+`,
     });
 
     await createEmailLog({
@@ -204,16 +249,18 @@ const approveUnplannedVisit = async (id) => {
     throw new Error("Visitor already processed");
   }
 
-  const updatedVisitor = await prisma.visitor.update({
-    where: { id },
-    data: {
-      status: "APPROVED",
-      approvedAt: new Date(),
-    },
-    include: {
-      host: true,
-    },
-  });
+const updatedVisitor = await prisma.visitor.update({
+  where: { id },
+  data: {
+    status: "APPROVED",
+    approvedAt: new Date(),
+    approvalToken: null,
+    tokenExpiry: null,
+  },
+  include: {
+    host: true,
+  },
+});
 
   const qr = await generateQRCode(updatedVisitor.visitorCode);
 
@@ -301,12 +348,14 @@ const rejectUnplannedVisit = async (id) => {
     throw new Error("Visitor already processed");
   }
 
- const updatedVisitor = await prisma.visitor.update({
+const updatedVisitor = await prisma.visitor.update({
   where: {
     id,
   },
   data: {
     status: "REJECTED",
+    approvalToken: null,
+    tokenExpiry: null,
   },
   include: {
     host: true,

@@ -31,6 +31,7 @@ app.use("/api/email-logs", require("./routes/emailLog.routes"));
 app.use("/api/checkin", require("./routes/checkin.routes"));
 app.use("/api/notifications", require("./routes/notification.routes"));
 app.use("/api/unplanned-visits",require("./routes/unplannedVisit.routes"));
+app.use("/api/host", require("./routes/host.routes"));
 app.use("/api/otp", require("./routes/otp.routes"));
 app.use("/api/dashboard",require("./routes/dashboard.routes"));
 app.use("/api/reports",require("./routes/report.routes"));
