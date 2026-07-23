@@ -1,30 +1,30 @@
-import {
-  LogOut,
-  UserCircle2,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { LogOut, UserCircle2 } from "lucide-react";
+import api from "../../services/api";
 
-const checkouts = [
-  {
-    id: 1,
-    visitor: "Rahul Sharma",
-    host: "John Doe",
-    time: "11:45 AM",
-  },
-  {
-    id: 2,
-    visitor: "Anjali Verma",
-    host: "David",
-    time: "12:10 PM",
-  },
-  {
-    id: 3,
-    visitor: "Ramesh Kumar",
-    host: "Michael",
-    time: "01:05 PM",
-  },
-];
 
 function RecentCheckOuts() {
+  const [checkouts, setCheckouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+  fetchCheckOuts();
+}, []);
+
+const fetchCheckOuts = async () => {
+  try {
+    const res = await api.get("/dashboard/recent-visitors");
+
+    const data = (res.data.data || []).filter(
+      (visitor) => visitor.status === "CHECKED_OUT"
+    );
+
+    setCheckouts(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
@@ -75,11 +75,11 @@ function RecentCheckOuts() {
               <div>
 
                 <h3 className="text-white font-semibold">
-                  {item.visitor}
+                  {item.name}
                 </h3>
 
                 <p className="text-slate-400">
-                  Host : {item.host}
+                  Host : {item.host?.name || "-"}
                 </p>
 
               </div>
@@ -89,7 +89,10 @@ function RecentCheckOuts() {
             <div className="text-right">
 
               <p className="text-cyan-400 font-semibold">
-                {item.time}
+                {new Date(item.checkedOutAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                })}
               </p>
 
               <p className="text-red-400 text-sm">

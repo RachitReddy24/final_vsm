@@ -20,6 +20,7 @@ const getDashboardSummary = async () => {
   checkedInVisitors,
   checkedOutVisitors,
   todayMeetings,
+  walkInVisitors,
 ] = await Promise.all([
     prisma.user.count(),
 
@@ -68,7 +69,15 @@ prisma.visitor.count({
         },
       },
     }),
-
+    prisma.visitor.count({
+  where: {
+    visitType: "WALK_IN",
+    createdAt: {
+      gte: today,
+      lt: tomorrow,
+    },
+  },
+}),
   ]);
 
  return {
@@ -81,6 +90,7 @@ prisma.visitor.count({
   checkedInVisitors,
   checkedOutVisitors,
   todayMeetings,
+  walkInVisitors,
  };
 };
 const getVisitorChart = async () => {
@@ -157,6 +167,7 @@ const getTodayMeetings = async () => {
   });
 
 };
+
 const getRecentActivities = async () => {
 
   const visitors = await prisma.visitor.findMany({

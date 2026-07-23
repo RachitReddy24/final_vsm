@@ -1,63 +1,74 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import api from "../../services/api";
 import {
   User,
   Clock3,
   Eye,
 } from "lucide-react";
 
-const queue = [
-  {
-    visitor: "Rahul Sharma",
-    host: "John Doe",
-    status: "Waiting Approval",
-    time: "09:30 AM",
-  },
-  {
-    visitor: "Anjali Verma",
-    host: "David",
-    status: "Approved",
-    time: "10:00 AM",
-  },
-  {
-    visitor: "Ramesh Kumar",
-    host: "Michael",
-    status: "Checked-In",
-    time: "10:20 AM",
-  },
-  {
-    visitor: "Priya Singh",
-    host: "HR Manager",
-    status: "Waiting Approval",
-    time: "11:00 AM",
-  },
-];
 
 function StatusBadge({ status }) {
   switch (status) {
-    case "Approved":
+    case "APPROVED":
       return (
         <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">
           Approved
         </span>
       );
 
-    case "Checked-In":
+    case "CHECKED_IN":
       return (
         <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-sm font-medium">
           Checked-In
         </span>
       );
 
+    case "CHECKED_OUT":
+      return (
+        <span className="px-3 py-1 rounded-full bg-slate-500/20 text-slate-300 text-sm font-medium">
+          Checked-Out
+        </span>
+      );
+
+    case "REJECTED":
+      return (
+        <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-sm font-medium">
+          Rejected
+        </span>
+      );
+
     default:
       return (
         <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-sm font-medium">
-          Waiting Approval
+          Pending
         </span>
       );
   }
 }
 
 function LiveVisitorQueue() {
+  const [queue, setQueue] = useState([]);
+const [loading, setLoading] = useState(true);
+useEffect(() => {
+  fetchQueue();
+}, []);
+
+const fetchQueue = async () => {
+  try {
+    const res = await api.get("/unplanned-visits");
+
+    setQueue(
+  (res.data.data || []).filter(
+    (visitor) => visitor.status !== "CHECKED_OUT"
+  )
+);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -135,10 +146,10 @@ function LiveVisitorQueue() {
 
           <tbody>
 
-            {queue.map((item, index) => (
+           {queue.map((item) => (
 
               <tr
-                key={index}
+                key={item.id}
                 className="border-b border-slate-800 hover:bg-slate-800/40 transition"
               >
 
@@ -156,7 +167,7 @@ function LiveVisitorQueue() {
                     </div>
 
                     <span className="text-white font-semibold">
-                      {item.visitor}
+                      {item.name}
                     </span>
 
                   </div>
@@ -164,7 +175,7 @@ function LiveVisitorQueue() {
                 </td>
 
                 <td className="text-slate-300">
-                  {item.host}
+                  {item.host?.name || "-"}
                 </td>
 
                 <td>
@@ -172,15 +183,13 @@ function LiveVisitorQueue() {
                 </td>
 
                 <td>
-
-                  <div className="flex items-center gap-2 text-cyan-400">
-
-                    <Clock3 size={16} />
-
-                    {item.time}
-
-                  </div>
-
+              <div className="flex items-center gap-2 text-cyan-400">
+               <Clock3 size={16} />
+                {new Date(item.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                  minute: "2-digit",
+                  })}
+               </div>
                 </td>
 
                 <td className="text-center">

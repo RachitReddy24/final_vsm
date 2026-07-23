@@ -1,30 +1,31 @@
-import {
-  CheckCircle2,
-  UserCircle2,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, UserCircle2 } from "lucide-react";
+import api from "../../services/api";
 
-const checkins = [
-  {
-    id: 1,
-    visitor: "Suresh Kumar",
-    host: "John Doe",
-    time: "09:15 AM",
-  },
-  {
-    id: 2,
-    visitor: "Priya Sharma",
-    host: "Finance",
-    time: "09:50 AM",
-  },
-  {
-    id: 3,
-    visitor: "Akash Patel",
-    host: "IT Department",
-    time: "10:05 AM",
-  },
-];
+
 
 function RecentCheckIns() {
+  const [checkins, setCheckins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+  fetchCheckIns();
+}, []);
+
+const fetchCheckIns = async () => {
+  try {
+    const res = await api.get("/dashboard/recent-visitors");
+
+    const data = (res.data.data || []).filter(
+      (visitor) => visitor.status === "CHECKED_IN"
+    );
+
+    setCheckins(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
@@ -64,11 +65,11 @@ function RecentCheckIns() {
               <div>
 
                 <h3 className="text-white font-semibold">
-                  {item.visitor}
+                  {item.name}
                 </h3>
 
                 <p className="text-slate-400">
-                  Host : {item.host}
+                  Host : {item.host?.name || "-"}
                 </p>
 
               </div>
@@ -78,7 +79,10 @@ function RecentCheckIns() {
             <div className="text-right">
 
               <p className="text-cyan-400 font-semibold">
-                {item.time}
+                {new Date(item.checkedInAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                  minute: "2-digit",
+                   })}
               </p>
 
               <p className="text-green-400 text-sm">

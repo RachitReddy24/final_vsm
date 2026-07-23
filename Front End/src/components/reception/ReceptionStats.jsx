@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Users,
   Clock3,
@@ -8,10 +10,25 @@ import {
   UserPlus,
 } from "lucide-react";
 
+
+function ReceptionStats() {
+const [summary, setSummary] = useState({}); 
+ useEffect(() => {
+  fetchDashboardSummary();
+}, []);
+
+const fetchDashboardSummary = async () => {
+  try {
+    const res = await api.get("/dashboard/summary");
+    setSummary(res.data.data);
+  } catch (error) {
+    console.error("Dashboard Summary Error:", error);
+  }
+};
 const stats = [
   {
     title: "Today's Visitors",
-    value: 48,
+    value: summary.todayVisitors || 0,
     icon: Users,
     color: "from-cyan-500 to-blue-600",
     border: "border-cyan-500/20",
@@ -19,15 +36,15 @@ const stats = [
   },
   {
     title: "Waiting for Approval",
-    value: 8,
+    value: summary.pendingApprovals || 0,
     icon: Clock3,
     color: "from-yellow-500 to-orange-500",
     border: "border-yellow-500/20",
     bg: "bg-yellow-500/10",
   },
   {
-    title: "Approved Today",
-    value: 30,
+    title: "Approved Visitors",
+    value: summary.approvedVisitors || 0,
     icon: BadgeCheck,
     color: "from-green-500 to-emerald-600",
     border: "border-green-500/20",
@@ -35,7 +52,7 @@ const stats = [
   },
   {
     title: "Checked-In Today",
-    value: 25,
+    value: summary.checkedInVisitors || 0,
     icon: LogIn,
     color: "from-indigo-500 to-cyan-500",
     border: "border-indigo-500/20",
@@ -43,7 +60,7 @@ const stats = [
   },
   {
     title: "Checked-Out Today",
-    value: 18,
+    value: summary.checkedOutVisitors || 0,
     icon: LogOut,
     color: "from-rose-500 to-pink-600",
     border: "border-rose-500/20",
@@ -51,15 +68,13 @@ const stats = [
   },
   {
     title: "Walk-In Visitors",
-    value: 6,
+    value: summary.walkInVisitors || 0,
     icon: UserPlus,
     color: "from-violet-500 to-purple-600",
     border: "border-violet-500/20",
     bg: "bg-violet-500/10",
   },
 ];
-
-function ReceptionStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 

@@ -9,7 +9,7 @@ import {
 
 const data = [
   { name: "HR", value: 32 },
-  { name: "IT", value: 48 },
+  { name: "IT", value: 48, },
   { name: "Finance", value: 21 },
   { name: "Sales", value: 27 },
   { name: "Admin", value: 18 },

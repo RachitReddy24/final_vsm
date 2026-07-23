@@ -1,34 +1,28 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Clock3,
-  User,
-  Eye,
-} from "lucide-react";
+import { Clock3, User, Eye } from "lucide-react";
+import api from "../../services/api";
 
-const meetings = [
-  {
-    visitor: "Rahul Sharma",
-    host: "John Doe",
-    time: "10:30 AM",
-  },
-  {
-    visitor: "Anjali Verma",
-    host: "David",
-    time: "11:00 AM",
-  },
-  {
-    visitor: "Ramesh Kumar",
-    host: "Michael",
-    time: "01:30 PM",
-  },
-  {
-    visitor: "Priya Singh",
-    host: "Sarah",
-    time: "03:00 PM",
-  },
-];
+
 
 function TodaysMeetings() {
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+  fetchMeetings();
+}, []);
+
+const fetchMeetings = async () => {
+  try {
+    const res = await api.get("/dashboard/today-meetings");
+
+    setMeetings(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -106,10 +100,10 @@ function TodaysMeetings() {
 
           <tbody>
 
-            {meetings.map((item, index) => (
+            {meetings.map((item) => (
 
               <tr
-                key={index}
+                key={item.id}
                 className="border-b border-slate-800 hover:bg-slate-800/40 transition"
               >
 
@@ -127,7 +121,7 @@ function TodaysMeetings() {
                     </div>
 
                     <span className="text-white font-semibold">
-                      {item.visitor}
+                      {item.visitor?.name || item.name}
                     </span>
 
                   </div>
@@ -135,7 +129,7 @@ function TodaysMeetings() {
                 </td>
 
                 <td className="text-slate-300">
-                  {item.host}
+                  {item.host?.name || "-"}
                 </td>
 
                 <td>
@@ -144,7 +138,10 @@ function TodaysMeetings() {
 
                     <Clock3 size={16} />
 
-                    {item.time}
+                    {new Date(item.meetingTime || item.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  })}
 
                   </div>
 

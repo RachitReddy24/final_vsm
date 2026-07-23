@@ -9,35 +9,34 @@ const dashboardController = require("../controllers/dashboard.controller");
 router.get(
   "/summary",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "RECEPTIONIST"),
   dashboardController.getDashboardSummary
 );
-
 router.get(
   "/visitor-chart",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "RECEPTIONIST"),
   dashboardController.getVisitorChart
 );
 
 router.get(
   "/recent-visitors",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "RECEPTIONIST"),
   dashboardController.getRecentVisitors
 );
 
 router.get(
   "/today-meetings",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "RECEPTIONIST"),
   dashboardController.getTodayMeetings
 );
+
 router.get(
   "/recent-activities",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "RECEPTIONIST"),
   dashboardController.getRecentActivities
 );
-
 module.exports = router;
