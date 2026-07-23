@@ -43,14 +43,9 @@ const adminMenu = [
     path: "/admin/pending-approvals",
   },
   {
-    title: "Approved Meetings",
+    title: "Approved Visitors",
     icon: CheckCircle2,
     path: "/admin/approved-meetings",
-  },
-  {
-    title: "Visitor History",
-    icon: ClipboardList,
-    path: "/admin/visitor-history",
   },
   {
     title: "Reports",

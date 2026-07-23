@@ -5,10 +5,9 @@ import {
   Mail,
 } from "lucide-react";
 
-import { useMeeting } from "../../context/MeetingContext";
-
-function ApprovedMeetingsTable() {
-  const { approvedMeetings } = useMeeting();
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+function ApprovedVisitorsTable({ approvedVisitors }) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
@@ -23,8 +22,7 @@ function ApprovedMeetingsTable() {
         />
 
         <input
-          placeholder="Search Approved Meetings..."
-          className="
+            placeholder="Search Approved Visitors..."          className="
             w-full
             pl-12
             pr-5
@@ -67,7 +65,7 @@ function ApprovedMeetingsTable() {
 
           <tbody>
 
-            {approvedMeetings.length === 0 ? (
+            {approvedVisitors.length=== 0 ? (
 
               <tr>
 
@@ -76,7 +74,7 @@ function ApprovedMeetingsTable() {
                   className="text-center py-10 text-slate-500"
                 >
 
-                  No Approved Meetings
+                  No Approved Visitors
 
                 </td>
 
@@ -84,7 +82,7 @@ function ApprovedMeetingsTable() {
 
             ) : (
 
-              approvedMeetings.map((item) => (
+              approvedVisitors.map((item) => (
 
                 <tr
                   key={item.id}
@@ -94,7 +92,7 @@ function ApprovedMeetingsTable() {
                   <td className="py-6">
 
                     <h3 className="text-white font-semibold">
-                      {item.visitor}
+                      {item.name}
                     </h3>
 
                     <p className="text-slate-500 text-sm">
@@ -108,14 +106,20 @@ function ApprovedMeetingsTable() {
                   </td>
 
                   <td className="text-slate-300">
-                    {item.host}
+                    {item.host?.name}
                   </td>
 
                   <td className="text-slate-300">
-                    {item.date}
-                    <br />
-                    {item.time}
-                  </td>
+  {item.approvedAt ? (
+    <>
+      {new Date(item.approvedAt).toLocaleDateString()}
+      <br />
+      {new Date(item.approvedAt).toLocaleTimeString()}
+    </>
+  ) : (
+    "-"
+  )}
+</td>
 
                   <td>
 
@@ -123,7 +127,7 @@ function ApprovedMeetingsTable() {
 
                       <CheckCircle2 size={16} />
 
-                      Approved
+                      {item.status}
 
                     </span>
 
@@ -193,4 +197,4 @@ function ApprovedMeetingsTable() {
   );
 }
 
-export default ApprovedMeetingsTable;
+export default ApprovedVisitorsTable;

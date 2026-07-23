@@ -18,9 +18,8 @@ import ScheduleMeeting from "../pages/admin/ScheduleMeeting";
 import Reports from "../pages/admin/Reports";
 import Settings from "../pages/admin/Settings";
 import EmployeeManagement from "../pages/admin/EmployeeManagement";
-import VisitorHistory from "../pages/admin/VisitorHistory";
 import DepartmentManagement from "../pages/admin/DepartmentManagement";
-import ApprovedMeetings from "../pages/admin/ApprovedMeetings";
+import ApprovedVisitors from "../pages/admin/ApprovedVisitors";
 import PendingApprovals from "../pages/admin/PendingApprovals";
 
 /* ---------------- RECEPTION ---------------- */
@@ -117,7 +116,7 @@ function AppRoutes() {
         path="/admin/approved-meetings"
         element={
           <ProtectedRoute roles={["ADMIN"]}>
-            <ApprovedMeetings />
+            <ApprovedVisitors />
           </ProtectedRoute>
         }
       />

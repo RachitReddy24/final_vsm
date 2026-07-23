@@ -9,15 +9,31 @@ import {
   Users,
 } from "lucide-react";
 
-import { useMeeting } from "../../context/MeetingContext";
-
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 function PendingApprovals() {
-  const {
-    pendingMeetings,
-    approvedMeetings,
-    rejectedMeetings,
-  } = useMeeting();
+const [pendingMeetings, setPendingMeetings] = useState([]);
+const [approvedMeetings, setApprovedMeetings] = useState([]);
+const [rejectedMeetings, setRejectedMeetings] = useState([]);
+const fetchVisitors = async () => {
+  try {
+    const [pendingRes, approvedRes, rejectedRes] = await Promise.all([
+      api.get("/unplanned-visits?status=PENDING"),
+      api.get("/unplanned-visits?status=APPROVED"),
+      api.get("/unplanned-visits?status=REJECTED"),
+    ]);
 
+    setPendingMeetings(pendingRes.data.data);
+    setApprovedMeetings(approvedRes.data.data);
+    setRejectedMeetings(rejectedRes.data.data);
+  } catch (error) {
+    console.error("Failed to fetch visitors:", error);
+  }
+};
+
+useEffect(() => {
+  fetchVisitors();
+}, []);
   return (
     <DashboardLayout>
 
@@ -77,8 +93,12 @@ function PendingApprovals() {
 
         {/* Table */}
 
-        <MeetingRequestTable />
-
+        <MeetingRequestTable
+  pendingMeetings={pendingMeetings}
+  approvedMeetings={approvedMeetings}
+  rejectedMeetings={rejectedMeetings}
+  onRefresh={fetchVisitors}
+/>
       </div>
 
     </DashboardLayout>

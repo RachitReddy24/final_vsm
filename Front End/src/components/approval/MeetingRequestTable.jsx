@@ -8,14 +8,8 @@ import {
 import ApproveModal from "./ApproveModal";
 import RejectModal from "./RejectModal";
 
-import { useMeeting } from "../../context/MeetingContext";
-
-function MeetingRequestTable() {
-  const {
-    pendingMeetings,
-    approveMeeting,
-    rejectMeeting,
-  } = useMeeting();
+import api from "../../services/api";
+function MeetingRequestTable({ pendingMeetings,onRefresh }) {
 
   const [selectedVisitor, setSelectedVisitor] = useState(null);
 
@@ -33,23 +27,42 @@ function MeetingRequestTable() {
     setRejectOpen(true);
   };
 
-  const handleApprove = () => {
-    approveMeeting(selectedVisitor.id);
+const handleApprove = async () => {
+  try {
+    await api.post(
+      `/unplanned-visits/${selectedVisitor.id}/approve`
+    );
 
     setApproveOpen(false);
+    setSelectedVisitor(null);
+    onRefresh();
 
-    alert(
-      "Meeting Approved.\n\nVisitor Email Ready.\nHost Email Ready."
+    alert("Visitor approved successfully.");
+  } catch (error) {
+    console.error(error);
+
+    alert("Failed to approve visitor.");
+  }
+};
+
+const handleReject = async (reason) => {
+  try {
+    await api.post(
+      `/unplanned-visits/${selectedVisitor.id}/reject`,
+      { reason }
     );
-  };
-
-  const handleReject = (reason) => {
-    rejectMeeting(selectedVisitor.id, reason);
 
     setRejectOpen(false);
+    setSelectedVisitor(null);
+    onRefresh();
 
-    alert("Meeting Rejected.");
-  };
+    alert("Visitor rejected successfully.");
+  } catch (error) {
+    console.error(error);
+
+    alert("Failed to reject visitor.");
+  }
+};
 
   return (
     <>
@@ -109,7 +122,17 @@ function MeetingRequestTable() {
 
             <tbody>
 
-              {pendingMeetings.map((item) => (
+               {pendingMeetings.length === 0 ? (
+    <tr>
+      <td
+        colSpan="6"
+        className="text-center py-8 text-slate-400"
+      >
+        No pending visitor requests.
+      </td>
+    </tr>
+  ) : (
+    pendingMeetings.map((item) => (
 
                 <tr
                   key={item.id}
@@ -117,7 +140,7 @@ function MeetingRequestTable() {
                 >
 
                   <td className="py-6 text-white font-semibold">
-                    {item.visitor}
+                    {item.name}
                   </td>
 
                   <td className="text-slate-300">
@@ -125,25 +148,25 @@ function MeetingRequestTable() {
                   </td>
 
                   <td className="text-slate-300">
-                    {item.host}
+                    {item.host?.name}
                   </td>
 
                   <td className="text-slate-300">
-                    {item.date}
+                    {new Date(item.createdAt).toLocaleDateString()}
                     <br />
-                    {item.time}
+                    {new Date(item.createdAt).toLocaleTimeString()}
                   </td>
 
                   <td>
 
                     <span className="px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400">
-                      Pending
+                     {item.status}
                     </span>
 
                   </td>
 
                   <td>
-
+    
                     <div className="flex justify-center gap-3">
 
                       <button
@@ -174,7 +197,9 @@ function MeetingRequestTable() {
 
                 </tr>
 
-              ))}
+                  ))
+                  )}
+
 
             </tbody>
 

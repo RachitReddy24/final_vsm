@@ -146,24 +146,24 @@ if (!otpRecord) {
   return visitor;
 };
 
-const getAllUnplannedVisits = async () => {
+const getAllUnplannedVisits = async (query) => {
+  const where = {
+    visitType: "WALK_IN",
+  };
+
+  if (query.status) {
+    where.status = query.status;
+  }
 
   return await prisma.visitor.findMany({
-
-    where: {
-      visitType: "WALK_IN",
-    },
-
+    where,
     include: {
       host: true,
     },
-
     orderBy: {
       createdAt: "desc",
     },
-
   });
-
 };
 
 const getUnplannedVisitById = async (id) => {
