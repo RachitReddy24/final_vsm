@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Users,
   CalendarDays,
@@ -6,28 +8,43 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+
+function AdminSummary() {
+  const [dashboard, setDashboard] = useState({});
+
+useEffect(() => {
+  fetchSummary();
+}, []);
+
+const fetchSummary = async () => {
+  try {
+    const res = await api.get("/dashboard/summary");
+    setDashboard(res.data.data);
+  } catch (error) {
+    console.error("Dashboard Summary Error:", error);
+  }
+};
+
 const summary = [
   {
     title: "Today's Visitors",
-    value: "48",
+    value: dashboard.todayVisitors || 0,
     icon: Users,
     color: "text-cyan-400",
   },
   {
     title: "Meetings",
-    value: "26",
+    value: dashboard.todayMeetings || 0,
     icon: CalendarDays,
     color: "text-violet-400",
   },
   {
     title: "Completed",
-    value: "39",
+    value: dashboard.checkedOutVisitors || 0,
     icon: CheckCircle2,
     color: "text-green-400",
   },
 ];
-
-function AdminSummary() {
   return (
     <div className="space-y-6">
 

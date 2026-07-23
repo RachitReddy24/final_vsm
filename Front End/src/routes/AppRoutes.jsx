@@ -79,7 +79,7 @@ function AppRoutes() {
       <Route
         path="/admin/dashboard"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <AdminDashboard />
           </ProtectedRoute>
         }
@@ -88,7 +88,7 @@ function AppRoutes() {
       <Route
         path="/admin/users"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <UserManagement />
           </ProtectedRoute>
         }
@@ -97,7 +97,7 @@ function AppRoutes() {
       <Route
         path="/admin/departments"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <DepartmentManagement />
           </ProtectedRoute>
         }
@@ -106,25 +106,17 @@ function AppRoutes() {
       <Route
         path="/admin/employees"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <EmployeeManagement />
           </ProtectedRoute>
         }
       />
 
-      <Route
-        path="/admin/visitor-history"
-        element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <VisitorHistory />
-          </ProtectedRoute>
-        }
-      />
-
+    
       <Route
         path="/admin/approved-meetings"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <ApprovedMeetings />
           </ProtectedRoute>
         }
@@ -133,7 +125,7 @@ function AppRoutes() {
       <Route
         path="/admin/pending-approvals"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <PendingApprovals />
           </ProtectedRoute>
         }
@@ -142,7 +134,7 @@ function AppRoutes() {
       <Route
         path="/admin/schedule-meeting"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <ScheduleMeeting />
           </ProtectedRoute>
         }
@@ -151,7 +143,7 @@ function AppRoutes() {
       <Route
         path="/admin/reports"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <Reports />
           </ProtectedRoute>
         }
@@ -160,7 +152,7 @@ function AppRoutes() {
       <Route
         path="/admin/settings"
         element={
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <ProtectedRoute roles={["ADMIN"]}>
             <Settings />
           </ProtectedRoute>
         }
@@ -171,7 +163,7 @@ function AppRoutes() {
       <Route
         path="/reception/dashboard"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <ReceptionDashboard />
           </ProtectedRoute>
         }
@@ -180,7 +172,7 @@ function AppRoutes() {
       <Route
         path="/reception/visitor-onboarding"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitorOnboarding />
           </ProtectedRoute>
         }
@@ -189,7 +181,7 @@ function AppRoutes() {
       <Route
         path="/reception/visit-verification"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitVerification />
           </ProtectedRoute>
         }
@@ -198,7 +190,7 @@ function AppRoutes() {
       <Route
         path="/reception/visitor-status"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitorStatus />
           </ProtectedRoute>
         }
@@ -207,7 +199,7 @@ function AppRoutes() {
       <Route
         path="/reception/visitor-check-in"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitorCheckIn />
           </ProtectedRoute>
         }
@@ -216,7 +208,7 @@ function AppRoutes() {
       <Route
         path="/reception/visitor-check-out"
         element={
-          <ProtectedRoute allowedRoles={["RECEPTION", "RECEPTIONIST"]}>
+          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitorCheckOut />
           </ProtectedRoute>
         }

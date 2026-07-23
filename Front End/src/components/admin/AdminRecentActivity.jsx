@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+
 import {
   UserPlus,
   QrCode,
@@ -7,45 +10,52 @@ import {
   LogOut,
 } from "lucide-react";
 
-const activities = [
-  {
-    title: "Visitor Registered",
-    description: "Rahul Sharma completed visitor registration.",
-    time: "09:15 AM",
-    icon: UserPlus,
-    color: "bg-blue-500",
-  },
-  {
-    title: "QR Pass Generated",
-    description: "Digital visitor pass created successfully.",
-    time: "09:20 AM",
-    icon: QrCode,
-    color: "bg-cyan-500",
-  },
-  {
-    title: "Host Approval",
-    description: "Meeting approved by Mr. Johnson.",
-    time: "09:25 AM",
-    icon: ShieldCheck,
-    color: "bg-violet-500",
-  },
-  {
-    title: "Visitor Checked In",
-    description: "Visitor entered the premises.",
-    time: "09:30 AM",
-    icon: CheckCircle2,
-    color: "bg-green-500",
-  },
-  {
-    title: "Visit Completed",
-    description: "Visitor checked out successfully.",
-    time: "11:45 AM",
-    icon: LogOut,
-    color: "bg-orange-500",
-  },
-];
+
 
 function AdminRecentActivity() {
+  const [activities, setActivities] = useState([]);
+
+useEffect(() => {
+  fetchRecentActivities();
+}, []);
+
+const fetchRecentActivities = async () => {
+  try {
+    const res = await api.get("/dashboard/recent-activities");
+    setActivities(res.data.data || []);
+  } catch (error) {
+    console.error("Recent Activities Error:", error);
+  }
+};
+const getIcon = (status) => {
+  switch (status) {
+    case "PENDING":
+      return UserPlus;
+    case "APPROVED":
+      return ShieldCheck;
+    case "CHECKED_IN":
+      return CheckCircle2;
+    case "CHECKED_OUT":
+      return LogOut;
+    default:
+      return QrCode;
+  }
+};
+
+const getColor = (status) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-blue-500";
+    case "APPROVED":
+      return "bg-violet-500";
+    case "CHECKED_IN":
+      return "bg-green-500";
+    case "CHECKED_OUT":
+      return "bg-orange-500";
+    default:
+      return "bg-cyan-500";
+  }
+};
   return (
     <motion.div
       initial={{
@@ -89,8 +99,7 @@ function AdminRecentActivity() {
 
           {activities.map((activity, index) => {
 
-            const Icon = activity.icon;
-
+             const Icon = getIcon(activity.status);
             return (
 
               <motion.div
@@ -116,7 +125,7 @@ function AdminRecentActivity() {
                   w-14
                   h-14
                   rounded-2xl
-                  ${activity.color}
+                  ${getColor(activity.status)}
                   flex
                   items-center
                   justify-center
@@ -137,13 +146,16 @@ function AdminRecentActivity() {
 
                     <h3 className="text-white font-semibold text-lg">
 
-                      {activity.title}
+                      {activity.status.replaceAll("_", " ")}
 
                     </h3>
 
                     <span className="text-cyan-400 text-sm">
 
-                      {activity.time}
+                      {new Date(activity.updatedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                     minute: "2-digit",
+                      })}
 
                     </span>
 
@@ -151,7 +163,7 @@ function AdminRecentActivity() {
 
                   <p className="text-slate-400 mt-2 leading-7">
 
-                    {activity.description}
+                    {`${activity.visitorName} - Host: ${activity.hostName}`}
 
                   </p>
 

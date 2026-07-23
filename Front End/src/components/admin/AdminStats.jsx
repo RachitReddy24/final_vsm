@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Users,
   CalendarDays,
@@ -10,18 +12,35 @@ import {
   LogOut,
 } from "lucide-react";
 
+
+
+function AdminStats() {
+  const [summary, setSummary] = useState({});
+  useEffect(() => {
+  fetchDashboardSummary();
+}, []);
+
+const fetchDashboardSummary = async () => {
+  try {
+    const res = await api.get("/dashboard/summary");
+    setSummary(res.data.data);
+    console.log("Dashboard Response:", res.data);
+  } catch (error) {
+    console.error("Dashboard Summary Error:", error);
+  }
+};
 const stats = [
   {
     title: "Total Visitors",
-    value: 1248,
+    value: summary.totalVisitors || 0,
     icon: Users,
     color: "from-blue-500 to-cyan-500",
     bg: "bg-blue-500/10",
     border: "border-blue-500/20",
   },
   {
-    title: "Total Meetings",
-    value: 324,
+    title: "Today's Meetings",
+    value: summary.todayMeetings || 0,
     icon: CalendarDays,
     color: "from-indigo-500 to-violet-500",
     bg: "bg-indigo-500/10",
@@ -29,7 +48,7 @@ const stats = [
   },
   {
     title: "Departments",
-    value: 18,
+    value: summary.totalDepartments || 0,
     icon: Building2,
     color: "from-purple-500 to-fuchsia-500",
     bg: "bg-purple-500/10",
@@ -37,7 +56,7 @@ const stats = [
   },
   {
     title: "Employees / Users",
-    value: 96,
+    value: summary.totalEmployees || 0,
     icon: UserCog,
     color: "from-cyan-500 to-sky-500",
     bg: "bg-cyan-500/10",
@@ -45,7 +64,7 @@ const stats = [
   },
   {
     title: "Pending Approvals",
-    value: 15,
+    value: summary.pendingApprovals || 0,
     icon: Clock3,
     color: "from-yellow-500 to-orange-500",
     bg: "bg-yellow-500/10",
@@ -53,7 +72,7 @@ const stats = [
   },
   {
     title: "Approved Visitors",
-    value: 203,
+    value: summary.approvedVisitors || 0,
     icon: BadgeCheck,
     color: "from-green-500 to-emerald-500",
     bg: "bg-green-500/10",
@@ -61,7 +80,7 @@ const stats = [
   },
   {
     title: "Checked-In Visitors",
-    value: 64,
+    value: summary.checkedInVisitors || 0,
     icon: LogIn,
     color: "from-teal-500 to-green-500",
     bg: "bg-teal-500/10",
@@ -69,15 +88,13 @@ const stats = [
   },
   {
     title: "Checked-Out Visitors",
-    value: 58,
+    value: summary.checkedOutVisitors || 0,
     icon: LogOut,
     color: "from-rose-500 to-pink-500",
     bg: "bg-rose-500/10",
     border: "border-rose-500/20",
   },
 ];
-
-function AdminStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
       {stats.map((item, index) => {

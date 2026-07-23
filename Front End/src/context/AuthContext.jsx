@@ -63,18 +63,26 @@ export const AuthProvider = ({ children }) => {
     // }
 
     const { token, user } = response.data;
+   
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+localStorage.setItem("token", token);
+localStorage.setItem("user", JSON.stringify(user));
 
-    setUser(user);
+localStorage.setItem("role", user.role);
+localStorage.setItem("userRole", user.role);
+localStorage.setItem("userName", user.name);
 
-    return user;
+setUser(user);
+
+return user;
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
 
     setUser(null);
   };
@@ -96,5 +104,4 @@ export const AuthProvider = ({ children }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
-
 export default AuthContext;

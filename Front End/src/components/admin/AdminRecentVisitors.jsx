@@ -1,35 +1,12 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Eye,
   Clock3,
 } from "lucide-react";
 
-const visitors = [
-  {
-    visitor: "Rahul Sharma",
-    host: "John Doe",
-    status: "Checked-In",
-    time: "09:30 AM",
-  },
-  {
-    visitor: "Priya Patel",
-    host: "David",
-    status: "Approved",
-    time: "10:15 AM",
-  },
-  {
-    visitor: "Anil Kumar",
-    host: "Michael",
-    status: "Pending",
-    time: "11:30 AM",
-  },
-  {
-    visitor: "Rakesh Verma",
-    host: "HR Manager",
-    status: "Rejected",
-    time: "12:45 PM",
-  },
-];
+
 
 function StatusBadge({ status }) {
   switch (status) {
@@ -64,6 +41,20 @@ function StatusBadge({ status }) {
 }
 
 function AdminRecentVisitors() {
+  const [visitors, setVisitors] = useState([]);
+
+useEffect(() => {
+  fetchRecentVisitors();
+}, []);
+
+const fetchRecentVisitors = async () => {
+  try {
+    const res = await api.get("/dashboard/recent-visitors");
+    setVisitors(res.data.data || []);
+  } catch (error) {
+    console.error("Recent Visitors Error:", error);
+  }
+};
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
@@ -125,16 +116,16 @@ function AdminRecentVisitors() {
             {visitors.map((item, index) => (
 
               <tr
-                key={index}
+                key={item.id}
                 className="border-b border-slate-800 hover:bg-slate-800/40 transition"
               >
 
                 <td className="py-5 text-white font-semibold">
-                  {item.visitor}
+                  {item.name}
                 </td>
 
                 <td className="text-slate-300">
-                  {item.host}
+                  {item.host?.name}
                 </td>
 
                 <td>
@@ -147,7 +138,10 @@ function AdminRecentVisitors() {
 
                     <Clock3 size={16} />
 
-                    {item.time}
+                    {new Date(item.createdAt).toLocaleTimeString([], {
+                   hour: "2-digit",
+                   minute: "2-digit",
+                    })}
 
                   </div>
 

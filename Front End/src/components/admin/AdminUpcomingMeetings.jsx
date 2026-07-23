@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   CalendarDays,
   Clock3,
@@ -6,34 +8,23 @@ import {
   Eye,
 } from "lucide-react";
 
-const meetings = [
-  {
-    meeting: "Business Discussion",
-    host: "John Doe",
-    date: "25 Jul 2026",
-    time: "10:30 AM",
-  },
-  {
-    meeting: "Vendor Meeting",
-    host: "David",
-    date: "25 Jul 2026",
-    time: "11:15 AM",
-  },
-  {
-    meeting: "Project Review",
-    host: "Michael",
-    date: "26 Jul 2026",
-    time: "02:00 PM",
-  },
-  {
-    meeting: "HR Interview",
-    host: "Sarah",
-    date: "26 Jul 2026",
-    time: "04:30 PM",
-  },
-];
+;
 
 function AdminUpcomingMeetings() {
+  const [meetings, setMeetings] = useState([]);
+
+useEffect(() => {
+  fetchTodayMeetings();
+}, []);
+
+const fetchTodayMeetings = async () => {
+  try {
+    const res = await api.get("/dashboard/today-meetings");
+    setMeetings(res.data.data || []);
+  } catch (error) {
+    console.error("Today's Meetings Error:", error);
+  }
+};
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
@@ -119,7 +110,7 @@ function AdminUpcomingMeetings() {
             {meetings.map((item, index) => (
 
               <tr
-                key={index}
+                key={item.id}
                 className="
                 border-b
                 border-slate-800
@@ -138,7 +129,7 @@ function AdminUpcomingMeetings() {
                     />
 
                     <span className="text-white font-semibold">
-                      {item.meeting}
+                      {item.purpose}
                     </span>
 
                   </div>
@@ -151,14 +142,14 @@ function AdminUpcomingMeetings() {
 
                     <User size={16} />
 
-                    {item.host}
+                    {item.host?.name}
 
                   </div>
 
                 </td>
 
                 <td className="text-slate-300">
-                  {item.date}
+                  {new Date(item.meetingDate).toLocaleDateString()}
                 </td>
 
                 <td>
@@ -167,7 +158,10 @@ function AdminUpcomingMeetings() {
 
                     <Clock3 size={16} />
 
-                    {item.time}
+                    {new Date(item.meetingDate).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  })}
 
                   </div>
 
