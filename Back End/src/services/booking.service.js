@@ -1,8 +1,10 @@
 const prisma = require("../config/prisma");
 const crypto = require("crypto");
 const { createNotification } = require("./notification.service");
-const getBookingDetails = async (token) => {
+const { generateVisitorQRCode } = require("./qr.service");
+const { sendVisitorEmail } = require("./email.service");
 
+const getBookingDetails = async (token) => {
   const meeting = await prisma.meeting.findUnique({
     where: {
       bookingToken: token,
@@ -39,7 +41,6 @@ const getBookingDetails = async (token) => {
 };
 
 const submitBooking = async (token, data) => {
-
   const meeting = await prisma.meeting.findUnique({
     where: {
       bookingToken: token,
@@ -67,61 +68,74 @@ const submitBooking = async (token, data) => {
 
   // Generate Visitor Code
   const visitorCode =
-    "VIS" +
-    crypto.randomBytes(4).toString("hex").toUpperCase();
+    "VIS" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    const otpRecord = await prisma.oTP.findFirst({
-  where: {
-    mobileNumber: data.mobileNumber,
-    verified: true,
-  },
-  orderBy: {
-    createdAt: "desc",
-  },
-});
-
-if (!otpRecord) {
-  throw new Error("Mobile number is not verified");
-}
-  const visitor = await prisma.visitor.create({
-    data: {
-
-      meetingId: meeting.id,
-
-      hostId: meeting.hostId,
-
-      visitorCode,
-
-      name: data.name,
-
-      email: data.email,
-
+  // Verify OTP
+  const otpRecord = await prisma.oTP.findFirst({
+    where: {
       mobileNumber: data.mobileNumber,
-
-      company: data.company,
-
-      designation: data.designation,
-
-      purpose: data.purpose,
-
-      cameFrom: data.cameFrom,
-
-      visitType: "PLANNED",
-
-      status: "PENDING",
-
-      photo: data.photo,
-
-      idProof: data.idProof,
-
+      verified: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
-await createNotification({
-  userId: meeting.hostId,
-  title: "Visitor Registered",
-  message: `${visitor.name} has registered for your meeting.`,
-});
-  return visitor;
+
+  if (!otpRecord) {
+    throw new Error("Mobile number is not verified");
+  }
+
+  // Create Visitor
+  const visitor = await prisma.visitor.create({
+    data: {
+      meetingId: meeting.id,
+      hostId: meeting.hostId,
+      visitorCode,
+      name: data.name,
+      email: data.email,
+      mobileNumber: data.mobileNumber,
+      company: data.company,
+      designation: data.designation,
+      purpose: data.purpose,
+      cameFrom: data.cameFrom,
+      visitType: "PLANNED",
+      status: "PENDING",
+      photo: data.photo,
+      idProof: data.idProof,
+    },
+  });
+
+  // Generate QR Code
+  const qr = await generateVisitorQRCode(visitor);
+
+  // Save QR Details
+  await prisma.qRCode.create({
+    data: {
+      visitorId: visitor.id,
+      qrImage: qr.qrImage,
+      expiryDate: meeting.meetingDate,
+      isUsed: false,
+    },
+  });
+
+  // Send Visitor Email
+  await sendVisitorEmail({
+    visitor,
+    meeting,
+    qrImage: qr.qrImage,
+  });
+
+  // Notify Reception (Host)
+  await createNotification({
+    userId: meeting.hostId,
+    title: "Visitor Registered",
+    message: `${visitor.name} has registered for your meeting.`,
+  });
+
+  return {
+    ...visitor,
+    qrImage: qr.qrImage,
+  };
 };
 
 module.exports = {

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import {
-  Scanner,
-} from "@yudiel/react-qr-scanner";
+import { Scanner } from "@yudiel/react-qr-scanner";
+
+import api from "../../services/api";
 
 import {
   QrCode,
@@ -14,23 +14,43 @@ import {
 function QRScanner({ onScan }) {
   const [lastScan, setLastScan] = useState("");
   const [scanned, setScanned] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleScan = (result) => {
+  const handleScan = async (result) => {
     if (!result || result.length === 0) return;
 
-    const value = result[0].rawValue;
+    const visitorCode = result[0].rawValue;
 
-    if (value === lastScan) return;
+    if (visitorCode === lastScan) return;
 
-    setLastScan(value);
-    setScanned(true);
+    try {
+      setLoading(true);
 
-    onScan(value);
+      const response = await api.post("/checkin/verify-qr", {
+        visitorCode,
+      });
+
+      setLastScan(visitorCode);
+      setScanned(true);
+
+      // Send verified visitor object to parent
+      onScan(response.data.data);
+
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Invalid QR Code"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetScanner = () => {
     setScanned(false);
     setLastScan("");
+
+    onScan(null);
   };
 
   return (
@@ -72,7 +92,7 @@ function QRScanner({ onScan }) {
 
       </div>
 
-      {/* Camera */}
+      {/* Scanner */}
 
       <div className="p-6">
 
@@ -109,11 +129,17 @@ function QRScanner({ onScan }) {
               <div>
 
                 <h3 className="text-white font-semibold">
-                  Waiting for QR Code...
+                  {loading
+                    ? "Verifying QR Code..."
+                    : "Waiting for QR Code..."}
                 </h3>
 
                 <p className="text-slate-400 text-sm mt-1">
-                  Position the visitor QR inside the camera frame.
+
+                  {loading
+                    ? "Please wait while verifying the visitor."
+                    : "Position the visitor QR inside the camera frame."}
+
                 </p>
 
               </div>
@@ -138,7 +164,7 @@ function QRScanner({ onScan }) {
                 <div>
 
                   <h3 className="text-green-400 font-semibold">
-                    QR Code Detected
+                    Visitor Verified
                   </h3>
 
                   <p className="text-slate-300 text-sm mt-1 break-all">

@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 function MeetingSummary({ visitor }) {
-
   if (!visitor) {
     return (
       <motion.div
@@ -19,7 +18,6 @@ function MeetingSummary({ visitor }) {
         className="rounded-[30px] border border-slate-800 bg-slate-900 p-8 shadow-xl"
       >
         <div className="text-center py-24">
-
           <Briefcase
             size={70}
             className="mx-auto text-slate-600"
@@ -32,11 +30,19 @@ function MeetingSummary({ visitor }) {
           <p className="text-slate-400 mt-3">
             Search a visitor to load meeting details.
           </p>
-
         </div>
       </motion.div>
     );
   }
+
+  const duration = visitor.checkedInAt
+    ? `${Math.floor(
+        // eslint-disable-next-line react-hooks/purity
+        (Date.now() -
+          new Date(visitor.checkedInAt).getTime()) /
+          60000
+      )} mins`
+    : "--";
 
   return (
     <motion.div
@@ -50,13 +56,10 @@ function MeetingSummary({ visitor }) {
       }}
       className="rounded-[30px] border border-slate-800 bg-slate-900 p-8 shadow-xl"
     >
-
       {/* Header */}
 
       <div className="flex items-center justify-between">
-
         <div>
-
           <h2 className="text-2xl font-bold text-white">
             Meeting Summary
           </h2>
@@ -64,18 +67,14 @@ function MeetingSummary({ visitor }) {
           <p className="text-slate-400 mt-2">
             Visitor meeting details
           </p>
-
         </div>
 
         <div className="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center">
-
           <CheckCircle2
             size={30}
             className="text-green-400"
           />
-
         </div>
-
       </div>
 
       {/* Meeting Details */}
@@ -85,49 +84,73 @@ function MeetingSummary({ visitor }) {
         <Detail
           icon={Briefcase}
           label="Meeting Title"
-          value={visitor.meetingTitle}
+          value={visitor.meeting?.title || "--"}
         />
 
         <Detail
           icon={Briefcase}
           label="Purpose"
-          value={visitor.purpose}
+          value={
+            visitor.purpose ||
+            visitor.meeting?.purpose ||
+            "--"
+          }
         />
 
         <Detail
           icon={User}
           label="Host"
-          value={visitor.host}
+          value={visitor.host?.name || "--"}
         />
 
         <Detail
           icon={Building2}
           label="Department"
-          value={visitor.department}
+          value={
+            visitor.host?.department?.name ||
+            visitor.department ||
+            "--"
+          }
         />
 
         <Detail
           icon={MapPin}
           label="Meeting Room"
-          value={visitor.meetingRoom}
+          value={
+            visitor.meeting?.room ||
+            visitor.meetingRoom ||
+            "--"
+          }
         />
 
         <Detail
           icon={CalendarDays}
           label="Meeting Date"
-          value={visitor.date}
+          value={
+            visitor.visitDate
+              ? new Date(
+                  visitor.visitDate
+                ).toLocaleDateString()
+              : "--"
+          }
         />
 
         <Detail
           icon={Clock3}
           label="Check-In Time"
-          value={visitor.checkInTime}
+          value={
+            visitor.checkedInAt
+              ? new Date(
+                  visitor.checkedInAt
+                ).toLocaleString()
+              : "--"
+          }
         />
 
         <Detail
           icon={Clock3}
           label="Duration"
-          value={visitor.duration}
+          value={duration}
         />
 
       </div>
@@ -143,7 +166,7 @@ function MeetingSummary({ visitor }) {
           </p>
 
           <h3 className="text-xl font-bold text-green-400 mt-1">
-            {visitor.status}
+            {visitor.status || "--"}
           </h3>
 
         </div>
@@ -154,7 +177,6 @@ function MeetingSummary({ visitor }) {
         />
 
       </div>
-
     </motion.div>
   );
 }
@@ -166,9 +188,7 @@ function Detail({
 }) {
   return (
     <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-
       <div className="flex items-center gap-3">
-
         <Icon
           size={20}
           className="text-cyan-400"
@@ -177,13 +197,11 @@ function Detail({
         <span className="text-slate-400">
           {label}
         </span>
-
       </div>
 
-      <span className="text-white font-semibold text-right">
+      <span className="text-white font-semibold text-right break-words max-w-[55%]">
         {value || "--"}
       </span>
-
     </div>
   );
 }

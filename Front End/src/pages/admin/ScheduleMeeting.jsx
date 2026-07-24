@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/roles/DashboardLayout";
 
@@ -34,11 +35,12 @@ function ScheduleMeeting() {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     loadEmployees();
     loadDepartments();
   }, []);
 
-  const loadEmployees = async () => {
+  async function loadEmployees() {
     try {
       const res = await api.get("/employees");
 
@@ -60,7 +62,7 @@ function ScheduleMeeting() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }
 
   const loadDepartments = async () => {
     try {

@@ -30,6 +30,7 @@ import VisitVerification from "../pages/reception/VisitVerification";
 import VisitorStatus from "../pages/reception/VisitorStatus";
 import VisitorCheckIn from "../pages/reception/VisitorCheckIn";
 import VisitorCheckOut from "../pages/reception/VisitorCheckOut";
+import PendingApprovals from "../pages/reception/PendingApprovals";
 
 /* ---------------- VISITOR ---------------- */
 
@@ -274,6 +275,10 @@ function AppRoutes() {
       <Route
         path="*"
         element={<Navigate to="/login" replace />}
+      />
+      <Route
+      path="/reception/pending-approvals"
+      element={<PendingApprovals />}
       />
 
     </Routes>

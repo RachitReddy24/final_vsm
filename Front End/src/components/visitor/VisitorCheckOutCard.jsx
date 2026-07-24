@@ -31,7 +31,7 @@ function VisitorCheckoutCard({
         </h2>
 
         <p className="text-slate-400 mt-2">
-          Search and complete visitor checkout.
+          Search a checked-in visitor using the Visitor Code.
         </p>
 
       </div>
@@ -50,7 +50,7 @@ function VisitorCheckoutCard({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Visitor Name / Mobile / Visitor ID"
+            placeholder="Enter Visitor Code (Example : VMS-2026-001)"
             className="w-full pl-12 py-4 rounded-2xl bg-slate-800 border border-slate-700 text-white outline-none"
           />
 
@@ -58,7 +58,7 @@ function VisitorCheckoutCard({
 
         <button
           onClick={onSearch}
-          disabled={loading}
+          disabled={loading || !search.trim()}
           className={`px-8 rounded-2xl text-white font-semibold transition ${
             loading
               ? "bg-slate-700 cursor-not-allowed"
@@ -81,7 +81,7 @@ function VisitorCheckoutCard({
             <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
 
             <p className="text-slate-300 mt-5">
-              Loading visitor...
+              Loading visitor details...
             </p>
 
           </div>
@@ -90,7 +90,7 @@ function VisitorCheckoutCard({
 
       )}
 
-      {/* No Visitor */}
+      {/* Empty */}
 
       {!loading && !visitor && (
 
@@ -104,11 +104,11 @@ function VisitorCheckoutCard({
             />
 
             <h3 className="text-white text-xl font-semibold mt-5">
-              No Visitor Selected
+              No Visitor Found
             </h3>
 
             <p className="text-slate-400 mt-2">
-              Search using Visitor ID, Mobile Number or Name.
+              Search using the Visitor Code to retrieve visitor details.
             </p>
 
           </div>
@@ -117,7 +117,7 @@ function VisitorCheckoutCard({
 
       )}
 
-      {/* Visitor */}
+            {/* Visitor */}
 
       {!loading && visitor && (
 
@@ -140,19 +140,27 @@ function VisitorCheckoutCard({
             <Info
               icon={User}
               label="Host"
-              value={visitor.host}
+              value={visitor.host?.name}
             />
 
             <Info
               icon={Clock3}
-              label="Check-In"
-              value={visitor.checkInTime}
+              label="Check-In Time"
+              value={
+                visitor.checkedInAt
+                  ? new Date(
+                      visitor.checkedInAt
+                    ).toLocaleString()
+                  : "--"
+              }
             />
 
             <Info
               icon={Clock3}
-              label="Meeting Duration"
-              value={visitor.duration}
+              label="Meeting"
+              value={
+                visitor.meeting?.title || "--"
+              }
             />
 
             <Info
@@ -172,9 +180,11 @@ function VisitorCheckoutCard({
             </h3>
 
             <textarea
-              rows="4"
+              rows={4}
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              onChange={(e) =>
+                setFeedback(e.target.value)
+              }
               placeholder="Enter visitor feedback..."
               className="mt-5 w-full rounded-2xl bg-slate-900 border border-slate-700 p-4 text-white outline-none resize-none"
             />
@@ -222,7 +232,11 @@ function VisitorCheckoutCard({
   );
 }
 
-function Info({ icon: Icon, label, value }) {
+function Info({
+  icon: Icon,
+  label,
+  value,
+}) {
   return (
     <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
 
@@ -243,7 +257,7 @@ function Info({ icon: Icon, label, value }) {
             {label}
           </p>
 
-          <p className="text-white font-semibold mt-1">
+          <p className="text-white font-semibold mt-1 break-words">
             {value || "--"}
           </p>
 

@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
-
-import { useMeeting } from "../../context/MeetingContext";
 
 import {
   UserPlus,
@@ -16,29 +15,40 @@ import {
 } from "lucide-react";
 
 function VisitorOnboarding() {
-
   const navigate = useNavigate();
 
-  const { addMeeting } = useMeeting();
+  const [employees, setEmployees] = useState([]);
 
   const [formData, setFormData] = useState({
-    visitor: "",
-    mobile: "",
+    name: "",
+    mobileNumber: "",
     email: "",
     company: "",
-    governmentId: "",
-    idNumber: "",
-    host: "",
-    department: "",
+    designation: "",
     purpose: "",
-    date: "",
-    time: "",
-    duration: "",
+    hostId: "",
   });
-const [otp, setOtp] = useState("");
-const [otpSent, setOtpSent] = useState(false);
-const [otpVerified, setOtpVerified] = useState(false);
-const [loading, setLoading] = useState(false);
+
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.get("/employees");
+
+      setEmployees(response.data.data || []);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to load employees");
+    }
+  };
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -47,456 +57,320 @@ const [loading, setLoading] = useState(false);
   };
 
   const handleGenerateQR = () => {
-    alert(
-      "QR Code generation will be connected with backend."
-    );
+    alert("QR will be generated automatically after approval.");
   };
 
- const handleSendOTP = async () => {
-  if (!formData.mobile) {
-    alert("Please enter mobile number");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    await api.post("/otp/send", {
-      mobileNumber: formData.mobile,
-    });
-
-    setOtpSent(true);
-    alert("OTP sent successfully.");
-  } catch (error) {
-    alert(error.response?.data?.message || "Failed to send OTP");
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleSubmit = () => {
-
-    if (
-      !formData.visitor ||
-      !formData.mobile ||
-      !formData.host
-    ) {
-      alert("Please fill all required fields.");
+  const handleSendOTP = async () => {
+    if (!formData.mobileNumber) {
+      alert("Please enter mobile number.");
       return;
     }
 
-    addMeeting({
-      visitor: formData.visitor,
-      company: formData.company,
-      email: formData.email,
-      mobile: formData.mobile,
-      host: formData.host,
-      department: formData.department,
-      purpose: formData.purpose,
-      date: formData.date,
-      time: formData.time,
-    });
+    try {
+      setLoading(true);
 
-    alert(
-      "Visitor Registered Successfully.\n\nWaiting for Admin Approval."
-    );
+      const response = await api.post("/otp/send", {
+        mobileNumber: formData.mobileNumber,
+      });
 
-    navigate("/admin/pending-approvals");
+      alert(response.data.message);
+
+      setOtpSent(true);
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Failed to send OTP."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleVerifyOTP = async () => {
+    try {
+      setLoading(true);
+
+      const response = await api.post("/otp/verify", {
+        mobileNumber: formData.mobileNumber,
+        otp,
+      });
+
+      alert(response.data.message);
+
+      setOtpVerified(true);
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "OTP verification failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!otpVerified) {
+      alert("Please verify OTP first.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        mobileNumber: formData.mobileNumber,
+        company: formData.company,
+        designation: formData.designation,
+        purpose: formData.purpose,
+        hostId: Number(formData.hostId),
+      };
+
+      const response = await api.post(
+        "/unplanned-visits",
+        payload
+      );
+
+      alert(response.data.message);
+
+      navigate("/reception/pending-approvals");
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Registration failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <ReceptionLayout>
+  <ReceptionLayout>
+    <div className="max-w-6xl mx-auto space-y-8">
 
-      <div className="space-y-8">
+      <Card className="p-8">
 
-        {/* Header */}
-
-        <div className="flex justify-between items-center">
-
+        <div className="flex items-center gap-3 mb-8">
+          <UserPlus className="w-8 h-8 text-blue-600" />
           <div>
-
-            <h1 className="text-4xl font-bold text-white">
-              Visitor Onboarding
+            <h1 className="text-3xl font-bold">
+              Walk-In Visitor Registration
             </h1>
 
-            <p className="text-slate-400 mt-2">
-              Register new visitors and generate a digital visitor pass.
+            <p className="text-gray-500">
+              Register an unplanned visitor
             </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <Input
+            label="Visitor Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter visitor name"
+            required
+          />
+
+          <Input
+            label="Mobile Number"
+            name="mobileNumber"
+            value={formData.mobileNumber}
+            onChange={handleChange}
+            placeholder="9876543210"
+            required
+          />
+
+          <Input
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="visitor@gmail.com"
+          />
+
+          <Input
+            label="Company"
+            name="company"
+            value={formData.company}
+            onChange={handleChange}
+            placeholder="ABC Pvt Ltd"
+            required
+          />
+
+          <Input
+            label="Designation"
+            name="designation"
+            value={formData.designation}
+            onChange={handleChange}
+            placeholder="Manager"
+            required
+          />
+
+          <Input
+            label="Purpose of Visit"
+            name="purpose"
+            value={formData.purpose}
+            onChange={handleChange}
+            placeholder="Meeting"
+            required
+          />
+
+        </div>
+
+        <div className="mt-8">
+
+          <label className="block mb-2 font-semibold">
+            Select Host Employee
+          </label>
+
+          <select
+            name="hostId"
+            value={formData.hostId}
+            onChange={handleChange}
+            className="w-full border rounded-xl p-3"
+          >
+            <option value="">
+              Select Employee
+            </option>
+
+            {employees.map((employee) => (
+
+              <option
+                key={employee.id}
+                value={employee.id}
+              >
+                {employee.name}
+              </option>
+
+            ))}
+
+          </select>
+
+        </div>
+
+        <div className="mt-8 flex gap-4">
+
+          <button
+            type="button"
+            onClick={handleSendOTP}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2"
+          >
+            <Send size={18} />
+            Send OTP
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGenerateQR}
+            className="bg-purple-600 text-white px-6 py-3 rounded-xl flex items-center gap-2"
+          >
+            <QrCode size={18} />
+            Generate QR
+          </button>
+
+        </div>
+
+        {otpSent && (
+
+          <div className="mt-8 flex gap-4 items-end">
+
+            <div className="flex-1">
+
+              <Input
+                label="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+              />
+
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVerifyOTP}
+              className="bg-green-600 text-white px-6 py-3 rounded-xl flex items-center gap-2"
+            >
+              <CheckCircle2 size={18} />
+              Verify OTP
+            </button>
 
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 bg-green-500/15 border border-green-500/30 text-green-400 px-5 py-3 rounded-2xl">
+        )}
+                <div className="mt-10">
 
-            <CheckCircle2 size={18} />
+          <h2 className="text-xl font-semibold mb-4">
+            Visitor Photo
+          </h2>
 
-            Reception Module
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-10 flex flex-col items-center justify-center">
+
+            <Camera
+              className="w-14 h-14 text-gray-400 mb-4"
+            />
+
+            <p className="text-gray-500 mb-4">
+              Capture visitor photo
+            </p>
+
+            <button
+              type="button"
+              className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-black transition"
+            >
+              Open Camera
+            </button>
 
           </div>
 
         </div>
 
-        <div className="grid xl:grid-cols-2 gap-8">
+        <div className="mt-10">
 
-          <Card title="Visitor Information">
+          <h2 className="text-xl font-semibold mb-4">
+            Identity Proof
+          </h2>
 
-            <div className="grid gap-5">
-
-              <Input
-                label="Visitor Name"
-                name="visitor"
-                value={formData.visitor}
-                onChange={handleChange}
-                placeholder="Enter visitor name"
-              />
-
-              <Input
-                label="Mobile Number"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                placeholder="+91 XXXXX XXXXX"
-              />
-
-              <Input
-                label="Email Address"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="visitor@email.com"
-              />
-
-              <Input
-                label="Company / Organization"
-                name="company"
-                value={formData.company}
-                onChange={handleChange}
-                placeholder="ABC Pvt Ltd"
-              />              <Input
-                label="Government ID"
-                name="governmentId"
-                value={formData.governmentId}
-                onChange={handleChange}
-                placeholder="Aadhaar / PAN / Passport"
-              />
-
-              <Input
-                label="ID Number"
-                name="idNumber"
-                value={formData.idNumber}
-                onChange={handleChange}
-                placeholder="Enter document number"
-              />
-
-            </div>
-
-          </Card>
-
-          {/* Meeting Information */}
-
-          <Card title="Meeting Information">
-
-            <div className="grid gap-5">
-
-              <Input
-                label="Host Name"
-                name="host"
-                value={formData.host}
-                onChange={handleChange}
-                placeholder="Meeting Person"
-              />
-
-              <Input
-                label="Department"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                placeholder="Select Department"
-              />
-
-              <Input
-                label="Purpose of Visit"
-                name="purpose"
-                value={formData.purpose}
-                onChange={handleChange}
-                placeholder="Business Meeting"
-              />
-
-              <Input
-                type="date"
-                label="Visit Date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-              />
-
-              <Input
-                type="time"
-                label="Visit Time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-              />
-
-              <Input
-                label="Expected Duration"
-                name="duration"
-                value={formData.duration}
-                onChange={handleChange}
-                placeholder="30 Minutes"
-              />
-
-            </div>
-
-          </Card>
+          <input
+            type="file"
+            className="w-full border rounded-xl p-3"
+          />
 
         </div>
 
-        {/* Camera */}
+        <div className="mt-10 flex justify-end gap-4">
+
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-6 py-3 rounded-xl border"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleSubmit}
+            className="px-8 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading
+              ? "Registering..."
+              : "Register Visitor"}
+          </button>
+
+        </div>
+
+      </Card>
+
+    </div>
+
+  </ReceptionLayout>
+);
 
-        <Card title="Visitor Photo">
-
-          <div className="rounded-3xl border-2 border-dashed border-slate-700 bg-slate-800 h-72 flex flex-col items-center justify-center">
-
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center shadow-xl">
-
-              <Camera
-                size={34}
-                className="text-white"
-              />
-
-            </div>
-
-            <h3 className="text-white text-xl font-semibold mt-6">
-              Camera Preview
-            </h3>
-
-            <p className="text-slate-400 mt-2">
-              Webcam integration will be connected later.
-            </p>
-
-            <button
-              type="button"
-              className="mt-6 px-6 py-3 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white transition"
-            >
-              Upload Photo
-            </button>
-
-          </div>
-
-        </Card>        {/* Action Buttons */}
-
-        <Card title="Registration Actions">
-
-          <div className="grid lg:grid-cols-3 gap-6">
-
-            <button
-              type="button"
-              onClick={handleGenerateQR}
-              className="flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-4 font-semibold shadow-lg hover:scale-105 transition"
-            >
-              <QrCode size={22} />
-              Generate QR
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSendOTP}
-              className="flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-sky-600 text-white py-4 font-semibold shadow-lg hover:scale-105 transition"
-            >
-              <Send size={22} />
-              Send OTP
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 text-white py-4 font-semibold shadow-lg hover:scale-105 transition"
-            >
-              <UserPlus size={22} />
-              Register Visitor
-            </button>
-
-          </div>
-
-        </Card>
-
-        {/* Information */}
-
-        <Card title="Registration Workflow">
-
-          <div className="grid md:grid-cols-4 gap-6">
-
-            <div className="bg-slate-800 rounded-2xl p-6 text-center">
-
-              <div className="w-12 h-12 mx-auto rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                1
-              </div>
-
-              <h3 className="mt-4 text-white font-semibold">
-                Reception
-              </h3>
-
-              <p className="text-slate-400 text-sm mt-2">
-                Register visitor details.
-              </p>
-
-            </div>
-
-            <div className="bg-slate-800 rounded-2xl p-6 text-center">
-
-              <div className="w-12 h-12 mx-auto rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">
-                2
-              </div>
-
-              <h3 className="mt-4 text-white font-semibold">
-                Pending Approval
-              </h3>
-
-              <p className="text-slate-400 text-sm mt-2">
-                Waiting for Admin approval.
-              </p>
-
-            </div>
-
-            <div className="bg-slate-800 rounded-2xl p-6 text-center">
-
-              <div className="w-12 h-12 mx-auto rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
-                3
-              </div>
-
-              <h3 className="mt-4 text-white font-semibold">
-                Approved
-              </h3>
-
-              <p className="text-slate-400 text-sm mt-2">
-                Reception can check-in visitor.
-              </p>
-
-            </div>
-
-            <div className="bg-slate-800 rounded-2xl p-6 text-center">
-
-              <div className="w-12 h-12 mx-auto rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
-                4
-              </div>
-
-              <h3 className="mt-4 text-white font-semibold">
-                Check-Out
-              </h3>
-
-              <p className="text-slate-400 text-sm mt-2">
-                Visitor exits and meeting closes.
-              </p>
-
-            </div>
-
-          </div>
-
-        </Card>        {/* Registration Summary */}
-
-        <Card title="Live Registration Summary">
-
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-6">
-
-              <p className="text-slate-400 text-sm">
-                Visitor
-              </p>
-
-              <h3 className="text-xl font-semibold text-white mt-2">
-                {formData.visitor || "--"}
-              </h3>
-
-            </div>
-
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-6">
-
-              <p className="text-slate-400 text-sm">
-                Host
-              </p>
-
-              <h3 className="text-xl font-semibold text-white mt-2">
-                {formData.host || "--"}
-              </h3>
-
-            </div>
-
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-6">
-
-              <p className="text-slate-400 text-sm">
-                Department
-              </p>
-
-              <h3 className="text-xl font-semibold text-white mt-2">
-                {formData.department || "--"}
-              </h3>
-
-            </div>
-
-            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-6">
-
-              <p className="text-slate-400 text-sm">
-                Meeting Time
-              </p>
-
-              <h3 className="text-xl font-semibold text-white mt-2">
-                {formData.time || "--"}
-              </h3>
-
-            </div>
-
-          </div>
-
-        </Card>
-
-        {/* Notes */}
-
-        <Card title="Instructions">
-
-          <div className="space-y-4 text-slate-300">
-
-            <div className="flex gap-3">
-
-              <div className="w-3 h-3 rounded-full bg-green-500 mt-2"></div>
-
-              <p>
-                Every visitor registration is first submitted for
-                <span className="text-green-400 font-semibold">
-                  {" "}Admin Approval
-                </span>.
-              </p>
-
-            </div>
-
-            <div className="flex gap-3">
-
-              <div className="w-3 h-3 rounded-full bg-yellow-500 mt-2"></div>
-
-              <p>
-                Reception cannot check-in a visitor until the meeting
-                request has been approved.
-              </p>
-
-            </div>
-
-            <div className="flex gap-3">
-
-              <div className="w-3 h-3 rounded-full bg-blue-500 mt-2"></div>
-
-              <p>
-                Once approved, a QR Pass and Email notification will be
-                generated automatically by the backend.
-              </p>
-
-            </div>
-
-          </div>
-
-        </Card>
-
-      </div>    </ReceptionLayout>
-  );
 }
 
 export default VisitorOnboarding;

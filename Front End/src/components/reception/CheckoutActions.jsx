@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 function CheckoutActions({
-  visitor,
-  items,
-  security,
+  visitor = null,
+  items = {},
+  security = {},
   loading = false,
   checkoutCompleted = false,
   onCheckout,
@@ -18,8 +18,8 @@ function CheckoutActions({
   onNotify,
   onCancel,
 }) {
-  const itemsVerified = Object.values(items).every(Boolean);
-  const securityVerified = Object.values(security).every(Boolean);
+  const itemsVerified = Object.values(items ?? {}).every(Boolean);
+  const securityVerified = Object.values(security ?? {}).every(Boolean);
 
   const canCheckout =
     visitor &&
@@ -75,10 +75,7 @@ function CheckoutActions({
       animate={{ opacity: 1, x: 0 }}
       className="rounded-[30px] border border-slate-800 bg-slate-900 p-8 shadow-xl"
     >
-      {/* Header */}
-
       <div className="mb-8">
-
         <h2 className="text-2xl font-bold text-white">
           Action Panel
         </h2>
@@ -86,15 +83,11 @@ function CheckoutActions({
         <p className="text-slate-400 mt-2">
           Choose an action to complete the visitor exit process.
         </p>
-
       </div>
-
-      {/* Status */}
 
       <div className="mb-8 rounded-2xl border border-slate-700 bg-slate-800 p-5">
 
         <div className="flex justify-between py-2 border-b border-slate-700">
-
           <span className="text-slate-400">
             Visitor Selected
           </span>
@@ -102,11 +95,9 @@ function CheckoutActions({
           <span className={visitor ? "text-green-400" : "text-red-400"}>
             {visitor ? "Completed" : "Pending"}
           </span>
-
         </div>
 
         <div className="flex justify-between py-2 border-b border-slate-700">
-
           <span className="text-slate-400">
             Items Returned
           </span>
@@ -114,11 +105,9 @@ function CheckoutActions({
           <span className={itemsVerified ? "text-green-400" : "text-yellow-400"}>
             {itemsVerified ? "Verified" : "Pending"}
           </span>
-
         </div>
 
         <div className="flex justify-between py-2">
-
           <span className="text-slate-400">
             Security Verification
           </span>
@@ -126,102 +115,61 @@ function CheckoutActions({
           <span className={securityVerified ? "text-green-400" : "text-yellow-400"}>
             {securityVerified ? "Verified" : "Pending"}
           </span>
-
         </div>
 
       </div>
 
-      {/* Action Buttons */}
-
-      <div className="grid grid-cols-1 gap-5">
-
+      <div className="grid gap-5">
         {actions.map((action) => {
-
           const Icon = action.icon;
 
           return (
-
             <motion.button
               key={action.title}
               whileHover={!action.disabled ? { scale: 1.03 } : {}}
               whileTap={!action.disabled ? { scale: 0.98 } : {}}
               disabled={action.disabled}
               onClick={action.action}
-              className={`
-                group
-                rounded-2xl
-                border
-                border-slate-800
-                bg-slate-800/70
-                p-5
-                transition-all
-                duration-300
-                ${action.hover}
-                ${action.disabled ? "opacity-50 cursor-not-allowed" : ""}
-              `}
+              className={`rounded-2xl border border-slate-800 bg-slate-800/70 p-5 transition ${
+                action.hover
+              } ${action.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-
               <div className="flex items-center gap-5">
 
                 <div
-                  className={`
-                    w-14
-                    h-14
-                    rounded-2xl
-                    bg-gradient-to-r
-                    ${action.gradient}
-                    flex
-                    items-center
-                    justify-center
-                    shadow-lg
-                  `}
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${action.gradient} flex items-center justify-center`}
                 >
-
                   <Icon
                     size={28}
-                    className={`text-white ${action.spin ? "animate-spin" : ""}`}
+                    className={action.spin ? "animate-spin text-white" : "text-white"}
                   />
-
                 </div>
 
                 <div className="text-left">
-
                   <h3 className="text-lg font-semibold text-white">
                     {loading && action.title === "Complete Check-Out"
                       ? "Processing..."
                       : action.title}
                   </h3>
 
-                  <p className="text-slate-400 text-sm mt-1">
+                  <p className="text-slate-400 text-sm">
                     {action.description}
                   </p>
-
                 </div>
 
               </div>
-
             </motion.button>
-
           );
-
         })}
-
       </div>
-
-      {/* Footer */}
 
       <div className="mt-8 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-5">
-
         <p className="text-cyan-300 text-sm">
-
           {checkoutCompleted
-            ? "Visitor checkout completed successfully. You can now print the exit slip or notify the host."
-            : "Complete all security verification and return all issued items before confirming visitor check-out."}
-
+            ? "Visitor checkout completed successfully."
+            : "Complete all verification steps before checkout."}
         </p>
-
       </div>
-
     </motion.div>
   );
 }
