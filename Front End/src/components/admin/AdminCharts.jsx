@@ -13,6 +13,7 @@ function AdminSummary() {
   const [dashboard, setDashboard] = useState({});
 
 useEffect(() => {
+  // eslint-disable-next-line react-hooks/immutability
   fetchSummary();
 }, []);
 

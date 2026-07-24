@@ -5,19 +5,47 @@ import {
   RotateCcw,
   Save,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 
-function CameraPreview() {
+function CameraPreview({ onCapture }) {
   const webcamRef = useRef(null);
+
   const [image, setImage] = useState(null);
+  const [capturedAt, setCapturedAt] = useState("");
+  const [cameraError, setCameraError] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const capture = () => {
     const img = webcamRef.current?.getScreenshot();
-    if (img) setImage(img);
+
+    if (!img) return;
+
+    setImage(img);
+    setCapturedAt(new Date().toLocaleString());
+    setSaved(false);
+
+    if (onCapture) {
+      onCapture(img);
+    }
   };
 
   const retake = () => {
     setImage(null);
+    setCapturedAt("");
+    setSaved(false);
+
+    if (onCapture) {
+      onCapture(null);
+    }
+  };
+
+  const savePhoto = () => {
+    // Backend API will be added here later
+
+    setSaved(true);
+
+    console.log("Photo Ready", image);
   };
 
   return (
@@ -54,33 +82,82 @@ function CameraPreview() {
 
       </div>
 
-      {/* Camera */}
-
       <div className="p-6">
 
-        <div className="rounded-3xl overflow-hidden border-2 border-slate-700 bg-black">
+        {cameraError ? (
 
-          {!image ? (
+          <div className="h-[420px] rounded-3xl border border-red-500/30 bg-red-500/10 flex flex-col items-center justify-center">
 
-            <Webcam
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              className="w-full h-[420px] object-cover"
+            <AlertTriangle
+              size={55}
+              className="text-red-400"
             />
 
-          ) : (
+            <h3 className="text-white text-xl font-semibold mt-4">
+              Camera Unavailable
+            </h3>
 
-            <img
-              src={image}
-              alt="Visitor"
-              className="w-full h-[420px] object-cover"
-            />
+            <p className="text-slate-400 mt-2 text-center px-8">
+              Please allow camera permission and refresh the page.
+            </p>
 
-          )}
+          </div>
 
-        </div>
+        ) : (
 
-        {/* Buttons */}
+          <div className="rounded-3xl overflow-hidden border-2 border-slate-700 bg-black">
+
+            {!image ? (
+
+              <Webcam
+                ref={webcamRef}
+                audio={false}
+                screenshotFormat="image/jpeg"
+                className="w-full h-[420px] object-cover"
+                onUserMediaError={() => setCameraError(true)}
+              />
+
+            ) : (
+
+              <img
+                src={image}
+                alt="Visitor"
+                className="w-full h-[420px] object-cover"
+              />
+
+            )}
+
+          </div>
+
+        )}
+
+        {capturedAt && (
+
+          <div className="mt-5 rounded-2xl border border-green-500/30 bg-green-500/10 p-4">
+
+            <h4 className="text-green-400 font-semibold">
+              Photo Captured
+            </h4>
+
+            <p className="text-slate-300 text-sm mt-1">
+              Captured At : {capturedAt}
+            </p>
+
+          </div>
+
+        )}
+
+        {saved && (
+
+          <div className="mt-4 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-4">
+
+            <p className="text-cyan-300 font-medium">
+              ✔ Visitor photo saved successfully.
+            </p>
+
+          </div>
+
+        )}
 
         <div className="grid grid-cols-2 gap-5 mt-6">
 
@@ -88,22 +165,8 @@ function CameraPreview() {
 
             <button
               onClick={capture}
-              className="
-              flex
-              items-center
-              justify-center
-              gap-3
-              py-4
-              rounded-2xl
-              bg-gradient-to-r
-              from-blue-600
-              to-cyan-500
-              hover:scale-105
-              transition-all
-              text-white
-              font-semibold
-              shadow-xl
-              "
+              disabled={cameraError}
+              className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-105 transition-all text-white font-semibold shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
 
               <Camera size={20} />
@@ -116,22 +179,7 @@ function CameraPreview() {
 
             <button
               onClick={retake}
-              className="
-              flex
-              items-center
-              justify-center
-              gap-3
-              py-4
-              rounded-2xl
-              bg-gradient-to-r
-              from-yellow-500
-              to-orange-500
-              hover:scale-105
-              transition-all
-              text-white
-              font-semibold
-              shadow-xl
-              "
+              className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:scale-105 transition-all text-white font-semibold shadow-xl"
             >
 
               <RotateCcw size={20} />
@@ -143,22 +191,14 @@ function CameraPreview() {
           )}
 
           <button
-            className="
-            flex
-            items-center
-            justify-center
-            gap-3
-            py-4
-            rounded-2xl
-            bg-gradient-to-r
-            from-green-600
-            to-emerald-500
-            hover:scale-105
-            transition-all
-            text-white
-            font-semibold
-            shadow-xl
-            "
+            onClick={savePhoto}
+            disabled={!image}
+            className={`flex items-center justify-center gap-3 py-4 rounded-2xl font-semibold shadow-xl transition-all
+              ${
+                image
+                  ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:scale-105 text-white"
+                  : "bg-slate-700 text-slate-500 cursor-not-allowed"
+              }`}
           >
 
             <Save size={20} />

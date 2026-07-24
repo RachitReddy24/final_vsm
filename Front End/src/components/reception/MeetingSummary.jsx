@@ -9,7 +9,35 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-function MeetingSummary() {
+function MeetingSummary({ visitor }) {
+
+  if (!visitor) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="rounded-[30px] border border-slate-800 bg-slate-900 p-8 shadow-xl"
+      >
+        <div className="text-center py-24">
+
+          <Briefcase
+            size={70}
+            className="mx-auto text-slate-600"
+          />
+
+          <h2 className="text-2xl font-bold text-white mt-6">
+            No Meeting Found
+          </h2>
+
+          <p className="text-slate-400 mt-3">
+            Search a visitor to load meeting details.
+          </p>
+
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{
@@ -20,14 +48,7 @@ function MeetingSummary() {
         opacity: 1,
         x: 0,
       }}
-      className="
-      rounded-[30px]
-      border
-      border-slate-800
-      bg-slate-900
-      p-8
-      shadow-xl
-      "
+      className="rounded-[30px] border border-slate-800 bg-slate-900 p-8 shadow-xl"
     >
 
       {/* Header */}
@@ -63,57 +84,57 @@ function MeetingSummary() {
 
         <Detail
           icon={Briefcase}
+          label="Meeting Title"
+          value={visitor.meetingTitle}
+        />
+
+        <Detail
+          icon={Briefcase}
           label="Purpose"
-          value="Business Discussion"
+          value={visitor.purpose}
         />
 
         <Detail
           icon={User}
           label="Host"
-          value="John Doe"
+          value={visitor.host}
         />
 
         <Detail
           icon={Building2}
           label="Department"
-          value="IT Department"
+          value={visitor.department}
         />
 
         <Detail
           icon={MapPin}
           label="Meeting Room"
-          value="Block A • Floor 2 • Room 204"
+          value={visitor.meetingRoom}
         />
 
         <Detail
           icon={CalendarDays}
           label="Meeting Date"
-          value="16 Jul 2026"
+          value={visitor.date}
+        />
+
+        <Detail
+          icon={Clock3}
+          label="Check-In Time"
+          value={visitor.checkInTime}
         />
 
         <Detail
           icon={Clock3}
           label="Duration"
-          value="2 Hours 15 Minutes"
+          value={visitor.duration}
         />
 
       </div>
 
       {/* Status */}
 
-      <div
-        className="
-        mt-8
-        rounded-2xl
-        bg-green-500/10
-        border
-        border-green-500/30
-        p-5
-        flex
-        items-center
-        justify-between
-        "
-      >
+      <div className="mt-8 rounded-2xl bg-green-500/10 border border-green-500/30 p-5 flex items-center justify-between">
 
         <div>
 
@@ -122,7 +143,7 @@ function MeetingSummary() {
           </p>
 
           <h3 className="text-xl font-bold text-green-400 mt-1">
-            Completed
+            {visitor.status}
           </h3>
 
         </div>
@@ -159,8 +180,8 @@ function Detail({
 
       </div>
 
-      <span className="text-white font-semibold">
-        {value}
+      <span className="text-white font-semibold text-right">
+        {value || "--"}
       </span>
 
     </div>

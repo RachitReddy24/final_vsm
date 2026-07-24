@@ -13,25 +13,18 @@ import {
   XCircle,
 } from "lucide-react";
 
-import { visitorDatabase } from "../../data/visitors";
-
 function Info({ icon: Icon, label, value }) {
   return (
     <div className="rounded-2xl bg-slate-800 border border-slate-700 p-4">
-
       <div className="flex gap-3">
-
         <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-
           <Icon
             size={18}
             className="text-cyan-400"
           />
-
         </div>
 
-        <div>
-
+        <div className="flex-1">
           <p className="text-xs text-slate-400">
             {label}
           </p>
@@ -39,39 +32,59 @@ function Info({ icon: Icon, label, value }) {
           <h4 className="font-semibold text-white mt-1 break-words">
             {value || "--"}
           </h4>
-
         </div>
-
       </div>
-
     </div>
   );
 }
 
-function VisitorInfoCard({ visitorId }) {
+function VisitorInfoCard({
+  visitor,
+  loading = false,
+  onCheckIn,
+  onReject,
+}) {
 
-  const visitor =
-    visitorDatabase.find(
-      (item) =>
-        item.id === visitorId ||
-        item.meetingId === visitorId
-    ) || {
-      id: "Waiting for QR Scan",
-      meetingId: "--",
-      name: "--",
-      mobile: "--",
-      email: "--",
-      company: "--",
-      host: "--",
-      department: "--",
-      purpose: "--",
-      date: "--",
-      time: "--",
-      status: "Not Verified",
-      qrVerified: false,
-      checkInTime: "--",
-      image: "",
-    };
+  if (loading) {
+    return (
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex items-center justify-center h-full min-h-[700px]">
+        <div className="text-center">
+
+          <div className="w-14 h-14 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
+
+          <p className="text-slate-400 mt-5">
+            Loading Visitor...
+          </p>
+
+        </div>
+      </div>
+    );
+  }
+
+  if (!visitor) {
+    return (
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex items-center justify-center h-full min-h-[700px]">
+
+        <div className="text-center px-8">
+
+          <User
+            size={70}
+            className="mx-auto text-slate-600"
+          />
+
+          <h2 className="text-white text-2xl font-bold mt-6">
+            No Visitor Selected
+          </h2>
+
+          <p className="text-slate-400 mt-3">
+            Scan a visitor QR code to load visitor details.
+          </p>
+
+        </div>
+
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
@@ -92,31 +105,15 @@ function VisitorInfoCard({ visitorId }) {
 
         </div>
 
-        <div
-          className={`flex items-center gap-2 rounded-xl px-4 py-2 border ${
-            visitorId
-              ? "bg-green-500/10 border-green-500/30"
-              : "bg-yellow-500/10 border-yellow-500/30"
-          }`}
-        >
+        <div className="flex items-center gap-2 rounded-xl px-4 py-2 border bg-green-500/10 border-green-500/30">
 
           <CheckCircle2
             size={18}
-            className={
-              visitorId
-                ? "text-green-400"
-                : "text-yellow-400"
-            }
+            className="text-green-400"
           />
 
-          <span
-            className={`text-sm font-semibold ${
-              visitorId
-                ? "text-green-400"
-                : "text-yellow-400"
-            }`}
-          >
-            {visitorId ? "Visitor Found" : "Waiting"}
+          <span className="text-green-400 text-sm font-semibold">
+            Visitor Found
           </span>
 
         </div>
@@ -212,7 +209,7 @@ function VisitorInfoCard({ visitorId }) {
 
         <Info
           icon={Timer}
-          label="Check-In"
+          label="Check-In Time"
           value={visitor.checkInTime}
         />
 
@@ -281,23 +278,15 @@ function VisitorInfoCard({ visitorId }) {
       <div className="grid grid-cols-2 gap-4 p-6 pt-0">
 
         <button
-          disabled={!visitorId}
-          className={`rounded-2xl py-4 text-white font-semibold transition ${
-            visitorId
-              ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:scale-105"
-              : "bg-slate-700 cursor-not-allowed"
-          }`}
+          onClick={onCheckIn}
+          className="rounded-2xl py-4 text-white font-semibold transition bg-gradient-to-r from-green-600 to-emerald-500 hover:scale-105"
         >
           Check-In
         </button>
 
         <button
-          disabled={!visitorId}
-          className={`rounded-2xl py-4 text-white font-semibold transition ${
-            visitorId
-              ? "bg-gradient-to-r from-red-600 to-rose-500 hover:scale-105"
-              : "bg-slate-700 cursor-not-allowed"
-          }`}
+          onClick={onReject}
+          className="rounded-2xl py-4 text-white font-semibold transition bg-gradient-to-r from-red-600 to-rose-500 hover:scale-105"
         >
           <div className="flex items-center justify-center gap-2">
             <XCircle size={18} />

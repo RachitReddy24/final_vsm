@@ -1,403 +1,415 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/roles/DashboardLayout";
-// eslint-disable-next-line no-unused-vars
-import ShareURLModal from "../../components/reception/ShareURLModal";
 
 import MeetingPreviewCard from "../../components/meeting/MeetingPreviewCard";
 import MeetingQRCode from "../../components/meeting/MeetingQRCode";
 
-import { generateMeeting } from "../../utils/meetingUtils";
+import api from "../../services/api";
 
 import {
   CalendarPlus,
-  Link2,
-  QrCode,
-  Mail,
+  Briefcase,
   User,
   Building2,
   Calendar,
-  Clock,
-  Briefcase,
 } from "lucide-react";
 
 function ScheduleMeeting() {
+  const [loading, setLoading] = useState(false);
 
   const [meeting, setMeeting] = useState(null);
 
-  const [visitor, setVisitor] = useState({
-    name: "",
-    mobile: "",
-    email: "",
-    company: "",
-    host: "",
-    department: "",
+  const [employees, setEmployees] = useState([]);
+
+  const [departments, setDepartments] = useState([]);
+
+  const [meetingData, setMeetingData] = useState({
+    title: "",
+    departmentId: "",
+    hostId: "",
     date: "",
     time: "",
     purpose: "",
-    notes: "",
+    remarks: "",
   });
-  
+
+  useEffect(() => {
+    loadEmployees();
+    loadDepartments();
+  }, []);
+
+  const loadEmployees = async () => {
+    try {
+      const res = await api.get("/employees");
+
+      console.log("Employees:", res.data);
+
+      let data = [];
+
+      if (Array.isArray(res.data))
+        data = res.data;
+      else if (Array.isArray(res.data.data))
+        data = res.data.data;
+      else if (Array.isArray(res.data.employees))
+        data = res.data.employees;
+      else if (Array.isArray(res.data.data?.employees))
+        data = res.data.data.employees;
+
+      setEmployees(data);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadDepartments = async () => {
+    try {
+
+      const res = await api.get("/departments");
+
+      console.log("Departments:", res.data);
+
+      let data = [];
+
+      if (Array.isArray(res.data))
+        data = res.data;
+      else if (Array.isArray(res.data.data))
+        data = res.data.data;
+      else if (Array.isArray(res.data.departments))
+        data = res.data.departments;
+      else if (Array.isArray(res.data.data?.departments))
+        data = res.data.data.departments;
+
+      setDepartments(data);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleChange = (field, value) => {
-    setVisitor((prev) => ({
+    setMeetingData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleGenerateMeeting = () => {
-    const data = generateMeeting();
+  const handleScheduleMeeting = async () => {
+    if (!meetingData.title)
+      return alert("Meeting title is required");
 
-    setMeeting({
-      ...data,
-      ...visitor,
-    });
+    if (!meetingData.hostId)
+      return alert("Please select Host");
+
+    if (!meetingData.date)
+      return alert("Please select Date");
+
+    if (!meetingData.time)
+      return alert("Please select Time");
+
+    setLoading(true);
+
+    try {
+
+      const payload = {
+        title: meetingData.title,
+
+        description:
+          `${meetingData.purpose}\n\n${meetingData.remarks}`,
+
+        meetingDate:
+          `${meetingData.date}T${meetingData.time}:00`,
+
+        hostId: Number(meetingData.hostId),
+      };
+
+      console.log(payload);
+
+      const res = await api.post(
+        "/meetings",
+        payload
+      );
+
+      console.log(res.data);
+
+      const data =
+        res.data.data || res.data;
+
+      setMeeting({
+        meetingId:
+          data.id ||
+          data.meetingId,
+
+        meetingUrl:
+          data.bookingUrl ||
+          data.meetingUrl ||
+          `${window.location.origin}/booking/${data.bookingToken}`,
+
+        ...data,
+      });
+
+      alert("Meeting Scheduled Successfully");
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert(
+        err?.response?.data?.message ||
+        "Unable to schedule meeting"
+      );
+
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <DashboardLayout>
 
       <div className="space-y-8">
+              <div className="bg-white rounded-2xl shadow-lg p-8">
 
-        {/* Header */}
-
-        <div className="flex justify-between items-center">
-
+        <div className="flex items-center gap-3 mb-8">
+          <CalendarPlus className="w-8 h-8 text-blue-600" />
           <div>
-
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-3xl font-bold">
               Schedule Meeting
             </h1>
-
-            <p className="text-slate-400 mt-2">
-              Create a planned visitor meeting and send invitations.
+            <p className="text-gray-500">
+              Create a new meeting for a visitor
             </p>
-
           </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+
+          <Input
+            icon={Briefcase}
+            label="Meeting Title"
+            value={meetingData.title}
+            onChange={(e) =>
+              handleChange("title", e.target.value)
+            }
+            placeholder="Project Discussion"
+          />
+
+          <Select
+            icon={Building2}
+            label="Department"
+            value={meetingData.departmentId}
+            onChange={(e) =>
+              handleChange(
+                "departmentId",
+                e.target.value
+              )
+            }
+          >
+            <option value="">
+              Select Department
+            </option>
+
+            {departments.map((department) => (
+              <option
+                key={department.id}
+                value={department.id}
+              >
+                {department.name}
+              </option>
+            ))}
+          </Select>
+
+          <Select
+            icon={User}
+            label="Host"
+            value={meetingData.hostId}
+            onChange={(e) =>
+              handleChange("hostId", e.target.value)
+            }
+          >
+            <option value="">
+              Select Host
+            </option>
+
+            {employees.map((employee) => (
+              <option
+                key={employee.id}
+                value={employee.id}
+              >
+                {employee.name}
+              </option>
+            ))}
+          </Select>
+
+          <Input
+            icon={Calendar}
+            type="date"
+            label="Meeting Date"
+            value={meetingData.date}
+            onChange={(e) =>
+              handleChange("date", e.target.value)
+            }
+          />
+
+          <Input
+            type="time"
+            label="Meeting Time"
+            value={meetingData.time}
+            onChange={(e) =>
+              handleChange("time", e.target.value)
+            }
+          />
+
+        </div>
+
+        <div className="mt-6">
+
+          <label className="block text-sm font-semibold mb-2">
+            Purpose
+          </label>
+
+          <textarea
+            rows="4"
+            value={meetingData.purpose}
+            onChange={(e) =>
+              handleChange(
+                "purpose",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-blue-500"
+            placeholder="Purpose of the meeting..."
+          />
+
+        </div>
+
+        <div className="mt-6">
+
+          <label className="block text-sm font-semibold mb-2">
+            Remarks
+          </label>
+
+          <textarea
+            rows="3"
+            value={meetingData.remarks}
+            onChange={(e) =>
+              handleChange(
+                "remarks",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-blue-500"
+            placeholder="Additional remarks..."
+          />
+
+        </div>
+
+        <div className="mt-8">
 
           <button
-            onClick={handleGenerateMeeting}
-            className="
-            px-6
-            py-3
-            rounded-2xl
-            bg-gradient-to-r
-            from-blue-600
-            to-cyan-500
-            text-white
-            font-semibold
-            hover:scale-105
-            transition
-            "
+            onClick={handleScheduleMeeting}
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4 font-semibold transition"
           >
-
-            <CalendarPlus
-              size={20}
-              className="inline mr-2"
-            />
-
-            Schedule Meeting
-
+            {loading
+              ? "Scheduling..."
+              : "Schedule Meeting"}
           </button>
 
         </div>
 
-        {/* Forms */}
-
-        <div className="grid xl:grid-cols-2 gap-8">
-
-          {/* Visitor Information */}
-
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Visitor Information
-            </h2>
-
-            <div className="grid gap-5">
-
-              <Input
-                icon={User}
-                label="Visitor Name"
-                value={visitor.name}
-                onChange={(e) =>
-                  handleChange("name", e.target.value)
-                }
-              />
-
-              <Input
-                icon={User}
-                label="Mobile Number"
-                value={visitor.mobile}
-                onChange={(e) =>
-                  handleChange("mobile", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Mail}
-                label="Email"
-                value={visitor.email}
-                onChange={(e) =>
-                  handleChange("email", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Building2}
-                label="Company"
-                value={visitor.company}
-                onChange={(e) =>
-                  handleChange("company", e.target.value)
-                }
-              />
-
-            </div>
-
-          </div>
-
-          {/* Meeting Information */}
-
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Meeting Information
-            </h2>
-
-            <div className="grid gap-5">
-
-              <Input
-                icon={User}
-                label="Host"
-                value={visitor.host}
-                onChange={(e) =>
-                  handleChange("host", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Building2}
-                label="Department"
-                value={visitor.department}
-                onChange={(e) =>
-                  handleChange("department", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Calendar}
-                type="date"
-                label="Meeting Date"
-                value={visitor.date}
-                onChange={(e) =>
-                  handleChange("date", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Clock}
-                type="time"
-                label="Meeting Time"
-                value={visitor.time}
-                onChange={(e) =>
-                  handleChange("time", e.target.value)
-                }
-              />
-
-              <Input
-                icon={Briefcase}
-                label="Purpose"
-                value={visitor.purpose}
-                onChange={(e) =>
-                  handleChange("purpose", e.target.value)
-                }
-              />
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Meeting Notes */}
-
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-
-          <h2 className="text-2xl font-bold text-white mb-5">
-            Meeting Notes
-          </h2>
-
-          <textarea
-            rows={5}
-            value={visitor.notes}
-            onChange={(e) =>
-              handleChange("notes", e.target.value)
-            }
-            placeholder="Enter meeting instructions..."
-            className="
-            w-full
-            bg-slate-800
-            border
-            border-slate-700
-            rounded-2xl
-            p-5
-            text-white
-            outline-none
-            focus:border-cyan-500
-            "
-          />
-
-        </div>
-                {/* Actions */}
-
-        <div className="grid lg:grid-cols-4 gap-6">
-
-          <ActionCard
-            icon={Link2}
-            title="Generate Secure URL"
-            onClick={handleGenerateMeeting}
-          />
-
-          <ActionCard
-            icon={QrCode}
-            title="Generate QR"
-            onClick={handleGenerateMeeting}
-          />
-
-          <ActionCard
-            icon={Mail}
-            title="Preview Host Email"
-            onClick={() => alert("Host Email Preview (Next Step)")}
-          />
-
-          <ActionCard
-            icon={Mail}
-            title="Preview Visitor Email"
-            onClick={() => alert("Visitor Email Preview (Next Step)")}
-          />
-
-        </div>
-
-        {/* Generated Meeting */}
-
-        {meeting && (
-
-          <div className="grid xl:grid-cols-2 gap-8">
-
-            <MeetingPreviewCard
-              meetingId={meeting.meetingId}
-              meetingUrl={meeting.meetingUrl}
-            />
-
-            <MeetingQRCode
-              meetingUrl={meeting.meetingUrl}
-            />
-
-          </div>
-
-        )}
-
       </div>
 
-    </DashboardLayout>
+      {meeting && (
+
+        <div className="grid lg:grid-cols-2 gap-6">
+
+          <MeetingPreviewCard
+            meeting={meeting}
+          />
+
+          <MeetingQRCode
+            meeting={meeting}
+          />
+
+        </div>
+
+      )}
+
+    </div>
+
+  </DashboardLayout>
   );
 }
-
-/* ========================================================= */
-
-function Input({
-  label,
+  function Input({
   icon: Icon,
+  label,
   type = "text",
   value,
   onChange,
+  placeholder,
 }) {
-
   return (
-
     <div>
-
-      <label className="block text-slate-300 mb-3">
-
+      <label className="block text-sm font-semibold mb-2">
         {label}
-
       </label>
 
       <div className="relative">
 
-        <Icon
-          size={18}
-          className="absolute left-4 top-4 text-cyan-400"
-        />
+        {Icon && (
+          <Icon className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+        )}
 
         <input
           type={type}
           value={value}
           onChange={onChange}
-          className="
-          w-full
-          pl-12
-          pr-5
-          py-4
-          rounded-2xl
-          bg-slate-800
-          border
-          border-slate-700
-          text-white
-          outline-none
-          focus:border-cyan-500
-          "
+          placeholder={placeholder}
+          className={`w-full border rounded-xl p-3 ${
+            Icon ? "pl-11" : ""
+          } focus:ring-2 focus:ring-blue-500 focus:outline-none`}
         />
+
+      </div>
+    </div>
+  );
+}
+
+function Select({
+  icon: Icon,
+  label,
+  value,
+  onChange,
+  children,
+}) {
+  return (
+    <div>
+
+      <label className="block text-sm font-semibold mb-2">
+        {label}
+      </label>
+
+      <div className="relative">
+
+        {Icon && (
+          <Icon className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+        )}
+
+        <select
+          value={value}
+          onChange={onChange}
+          className={`w-full border rounded-xl p-3 ${
+            Icon ? "pl-11" : ""
+          } focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+        >
+          {children}
+        </select>
 
       </div>
 
     </div>
-
   );
-
-}
-
-/* ========================================================= */
-
-function ActionCard({
-  icon: Icon,
-  title,
-  onClick,
-}) {
-
-  return (
-
-    <button
-      onClick={onClick}
-      className="
-      bg-slate-900
-      border
-      border-slate-800
-      rounded-3xl
-      p-8
-      hover:border-cyan-500
-      hover:scale-105
-      transition-all
-      duration-300
-      text-left
-      "
-    >
-
-      <Icon
-        size={36}
-        className="text-cyan-400"
-      />
-
-      <h3 className="text-white font-semibold mt-5">
-
-        {title}
-
-      </h3>
-
-    </button>
-
-  );
-
 }
 
 export default ScheduleMeeting;

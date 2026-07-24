@@ -6,48 +6,56 @@ import {
   PackageCheck,
   FileSignature,
   CheckCircle2,
+  Circle,
 } from "lucide-react";
 
 const checklist = [
   {
-    id: 1,
+    key: "identityVerified",
     title: "Visitor Identity Verified",
     description: "Identity matches registered visitor.",
     icon: UserCheck,
-    completed: true,
   },
   {
-    id: 2,
+    key: "hostApproved",
     title: "Host Approved Exit",
     description: "Host has approved visitor departure.",
     icon: ShieldCheck,
-    completed: true,
   },
   {
-    id: 3,
+    key: "qrScanned",
     title: "QR Badge Scanned",
     description: "Visitor badge successfully scanned.",
     icon: QrCode,
-    completed: true,
   },
   {
-    id: 4,
+    key: "assetsReturned",
     title: "No Pending Assets",
     description: "All issued assets have been returned.",
     icon: PackageCheck,
-    completed: true,
   },
   {
-    id: 5,
+    key: "signatureCollected",
     title: "Visitor Signature Collected",
     description: "Digital exit confirmation completed.",
     icon: FileSignature,
-    completed: false,
   },
 ];
 
-function SecurityChecklist() {
-  const completedCount = checklist.filter(item => item.completed).length;
+function SecurityChecklist({
+  security,
+  setSecurity,
+}) {
+
+  const toggleItem = (key) => {
+    setSecurity((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const completedCount =
+    Object.values(security).filter(Boolean).length;
 
   return (
     <motion.div
@@ -60,6 +68,7 @@ function SecurityChecklist() {
       <div className="flex items-center justify-between">
 
         <div>
+
           <h2 className="text-2xl font-bold text-white">
             Security Checklist
           </h2>
@@ -67,6 +76,7 @@ function SecurityChecklist() {
           <p className="text-slate-400 mt-2">
             Complete all security verifications before checkout.
           </p>
+
         </div>
 
         <div className="text-right">
@@ -90,12 +100,15 @@ function SecurityChecklist() {
         {checklist.map((item) => {
 
           const Icon = item.icon;
+          const verified = security[item.key];
 
           return (
 
-            <div
-              key={item.id}
-              className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-800/60 p-5"
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => toggleItem(item.key)}
+              className="w-full flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-800/60 hover:border-cyan-500 transition p-5"
             >
 
               <div className="flex items-center gap-4">
@@ -109,7 +122,7 @@ function SecurityChecklist() {
 
                 </div>
 
-                <div>
+                <div className="text-left">
 
                   <h4 className="text-white font-semibold">
                     {item.title}
@@ -123,7 +136,7 @@ function SecurityChecklist() {
 
               </div>
 
-              {item.completed ? (
+              {verified ? (
 
                 <span className="inline-flex items-center gap-2 rounded-full bg-green-500/20 px-4 py-2 text-green-400">
 
@@ -135,7 +148,9 @@ function SecurityChecklist() {
 
               ) : (
 
-                <span className="rounded-full bg-yellow-500/20 px-4 py-2 text-yellow-400">
+                <span className="inline-flex items-center gap-2 rounded-full bg-yellow-500/20 px-4 py-2 text-yellow-400">
+
+                  <Circle size={16} />
 
                   Pending
 
@@ -143,7 +158,7 @@ function SecurityChecklist() {
 
               )}
 
-            </div>
+            </button>
 
           );
 
@@ -157,7 +172,10 @@ function SecurityChecklist() {
 
         <div className="flex items-center gap-3">
 
-          <ShieldCheck className="text-green-400" size={24} />
+          <ShieldCheck
+            className="text-green-400"
+            size={24}
+          />
 
           <div>
 
@@ -166,7 +184,9 @@ function SecurityChecklist() {
             </h4>
 
             <p className="text-sm text-slate-300">
-              Complete all pending verification steps before enabling visitor check-out.
+              {completedCount === checklist.length
+                ? "All security verification steps have been completed."
+                : "Complete all pending verification steps before enabling visitor check-out."}
             </p>
 
           </div>
