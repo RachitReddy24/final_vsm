@@ -1,5 +1,4 @@
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
-
 import RegistrationForm from "../../components/visitor/RegistrationForm";
 import IDUpload from "../../components/visitor/IDUpload";
 import CameraCapture from "../../components/visitor/CameraCapture";
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 
 function VisitorOnboarding() {
+
   return (
     <ReceptionLayout>
 
@@ -56,7 +56,7 @@ function VisitorOnboarding() {
 
         {/* Registration Form */}
 
-        <RegistrationForm />
+<RegistrationForm />
 
         {/* Upload Section */}
 

@@ -12,7 +12,7 @@ const createMeeting = async (req, res) => {
     });
 
   } catch (error) {
-
+     console.error("Create Meeting Error:", error);
     res.status(400).json({
       success: false,
       message: error.message,
@@ -139,13 +139,17 @@ const getMeetingByBookingToken = async (req, res) => {
   }
 
 };
-const registerVisitor = async (req, res) => {
-
+const registerVisitor = async (req, res, next) => {
   try {
-
+    const photoFile = req.files?.photo?.[0];
+    const idProofFile = req.files?.idProof?.[0];
+    console.log(req.files);
+    console.log(req.body);
     const visitor = await meetingService.registerVisitor(
       req.params.token,
-      req.body
+      req.body,
+      photoFile,
+      idProofFile
     );
 
     res.status(201).json({
@@ -153,16 +157,9 @@ const registerVisitor = async (req, res) => {
       message: "Visitor registered successfully",
       data: visitor,
     });
-
   } catch (error) {
-
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-
+    next(error);
   }
-
 };
 module.exports = {
   createMeeting,

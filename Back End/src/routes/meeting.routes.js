@@ -16,7 +16,10 @@ router.get("/", authenticate, meetingController.getAllMeetings);
 router.get("/booking/:token",meetingController.getMeetingByBookingToken);
 router.post(
   "/booking/:token/register",
-  upload.single("photo"),
+  upload.fields([
+    { name: "photo", maxCount: 1 },
+    { name: "idProof", maxCount: 1 },
+  ]),
   validate,
   meetingController.registerVisitor
 );
