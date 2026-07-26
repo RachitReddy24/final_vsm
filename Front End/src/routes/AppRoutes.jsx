@@ -30,8 +30,7 @@ import VisitVerification from "../pages/reception/VisitVerification";
 import VisitorStatus from "../pages/reception/VisitorStatus";
 import VisitorCheckIn from "../pages/reception/VisitorCheckIn";
 import VisitorCheckOut from "../pages/reception/VisitorCheckOut";
-import PendingApprovals from "../pages/reception/PendingApprovals";
-
+import ReceptionPendingApprovals from "../pages/reception/PendingApproval";
 /* ---------------- VISITOR ---------------- */
 
 import VisitorRegistration from "../pages/visitor/VisitorRegistration";
@@ -278,7 +277,7 @@ function AppRoutes() {
       />
       <Route
       path="/reception/pending-approvals"
-      element={<PendingApprovals />}
+      element={<ReceptionPendingApprovals />}
       />
 
     </Routes>

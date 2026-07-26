@@ -30,60 +30,61 @@ function LoginCard() {
     remember: false,
   });
  
-  const handleLogin = async () => {
-    if (!form.username.trim()) {
-      toast.error("Please enter your email.");
-      return;
+const handleLogin = async (e) => {
+  e?.preventDefault();
+
+  if (!form.username.trim()) {
+    toast.error("Please enter your email.");
+    return;
+  }
+
+  if (!form.password.trim()) {
+    toast.error("Please enter your password.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const user = await login(
+      form.username,
+      form.password
+    );
+
+    toast.success("Login Successful");
+
+    switch ((user.role || "").toUpperCase()) {
+      case "ADMIN":
+        navigate("/admin/dashboard", { replace: true });
+        break;
+
+      case "RECEPTION":
+      case "RECEPTIONIST":
+        navigate("/reception/dashboard", {
+          replace: true,
+        });
+        break;
+
+      case "EMPLOYEE":
+      case "HOST":
+        navigate("/employee/dashboard", {
+          replace: true,
+        });
+        break;
+
+      default:
+        toast.error("Unauthorized role");
     }
- 
-    if (!form.password.trim()) {
-      toast.error("Please enter your password.");
-      return;
-    }
- 
-    try {
-      setLoading(true);
- 
-      const user = await login(
-        form.username,
-        form.password
-      );
- 
-      toast.success("Login Successful");
- 
-      switch ((user.role || "").toUpperCase()) {
-        case "ADMIN":
-          navigate("/admin/dashboard", { replace: true });
-          break;
- 
-        case "RECEPTION":
-        case "RECEPTIONIST":
-          navigate("/reception/dashboard", {
-            replace: true,
-          });
-          break;
- 
-        case "EMPLOYEE":
-        case "HOST":
-          navigate("/employee/dashboard", {
-            replace: true,
-          });
-          break;
- 
-        default:
-          toast.error("Unauthorized role");
-      }
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          error.message ||
-          "Login Failed"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
- 
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message ||
+        error.message ||
+        "Login Failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -150,55 +151,44 @@ function LoginCard() {
       />
  
       {/* Form */}
- 
-      <div className="mt-8 space-y-6">
- 
+
+<form
+  onSubmit={handleLogin}
+  className="mt-8 space-y-6"
+> 
         {/* Email */}
  
-        <div>
-          <label className="text-slate-200 font-medium block mb-3">
-            Email
-          </label>
- 
-          <div className="relative">
-            <User
-              size={20}
-              className="absolute left-4 top-4 text-cyan-400"
-            />
- 
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={form.username}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  username: e.target.value,
-                })
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleLogin();
-              }}
-              className="
-                w-full
-                rounded-2xl
-                bg-slate-900/70
-                border
-                border-slate-700
-                pl-12
-                pr-5
-                py-4
-                text-white
-                outline-none
-                transition-all
-                duration-300
-                focus:border-cyan-400
-                focus:ring-2
-                focus:ring-cyan-500/20
-              "
-            />
-          </div>
-        </div>
+<input
+  id="username"
+  name="username"
+  type="email"
+  placeholder="Enter your email"
+  autoComplete="username"
+  value={form.username}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      username: e.target.value,
+    })
+  }
+  className="
+    w-full
+    rounded-2xl
+    bg-slate-900/70
+    border
+    border-slate-700
+    pl-12
+    pr-5
+    py-4
+    text-white
+    outline-none
+    transition-all
+    duration-300
+    focus:border-cyan-400
+    focus:ring-2
+    focus:ring-cyan-500/20
+  "
+/>
  
         {/* Password */}
  
@@ -213,42 +203,37 @@ function LoginCard() {
               className="absolute left-4 top-4 text-cyan-400"
             />
  
-            <input
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
-              }
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  password: e.target.value,
-                })
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleLogin();
-              }}
-              className="
-                w-full
-                rounded-2xl
-                bg-slate-900/70
-                border
-                border-slate-700
-                pl-12
-                pr-14
-                py-4
-                text-white
-                outline-none
-                transition-all
-                duration-300
-                focus:border-cyan-400
-                focus:ring-2
-                focus:ring-cyan-500/20
-              "
-            />
- 
+           <input
+  id="password"
+  name="password"
+  type={showPassword ? "text" : "password"}
+  placeholder="Enter your password"
+  autoComplete="current-password"
+  value={form.password}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      password: e.target.value,
+    })
+  }
+  className="
+    w-full
+    rounded-2xl
+    bg-slate-900/70
+    border
+    border-slate-700
+    pl-12
+    pr-14
+    py-4
+    text-white
+    outline-none
+    transition-all
+    duration-300
+    focus:border-cyan-400
+    focus:ring-2
+    focus:ring-cyan-500/20
+  "
+/>
             <button
               type="button"
               onClick={() =>
@@ -312,8 +297,7 @@ function LoginCard() {
         <div className="border-t border-slate-700 pt-8">
  
           <button
-            type="button"
-            onClick={handleLogin}
+            type="submit"
             disabled={loading}
             className="
               w-full
@@ -361,10 +345,10 @@ function LoginCard() {
           Secure Enterprise Login
         </p>
  
-      </div>
- 
+      </form>
     </motion.div>
   );
 }
  
+    
 export default LoginCard;

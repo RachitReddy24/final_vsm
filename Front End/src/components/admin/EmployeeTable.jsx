@@ -24,6 +24,8 @@ const fetchEmployees = async () => {
   try {
     const response = await api.get("/employees");
 
+    console.log("Employees API Response:", response.data);
+
     setEmployees(response.data.data.employees);
   } catch (error) {
     console.error(error);
@@ -139,7 +141,8 @@ const addEmployee = async (employee) => {
 
           <tbody>
 
-            {employees.map((employee) => (
+            {Array.isArray(employees) &&
+            employees.map((employee) => (
 
               <tr
                 key={employee.id}

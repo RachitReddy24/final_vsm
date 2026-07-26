@@ -167,5 +167,6 @@ function VisitorCheckOut() {
     onClose={() => setShowSuccess(false)}
   />
 </ReceptionLayout>
-};
+  );
+}
 export default VisitorCheckOut;

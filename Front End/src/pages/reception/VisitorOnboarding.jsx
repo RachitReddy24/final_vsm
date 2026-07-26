@@ -38,17 +38,23 @@ function VisitorOnboarding() {
     fetchEmployees();
   }, []);
 
-  const fetchEmployees = async () => {
-    try {
-      const response = await api.get("/employees");
+const fetchEmployees = async () => {
+  try {
+    const response = await api.get("/employees");
 
-      setEmployees(response.data.data || []);
-    } catch (error) {
-      console.error(error);
-      alert("Unable to load employees");
-    }
-  };
+    console.log(response.data);
 
+    setEmployees(
+      Array.isArray(response.data?.data?.employees)
+        ? response.data.data.employees
+        : []
+    );
+  } catch (error) {
+    console.error(error);
+    alert("Unable to load employees");
+    setEmployees([]);
+  }
+};
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -236,7 +242,8 @@ function VisitorOnboarding() {
               Select Employee
             </option>
 
-            {employees.map((employee) => (
+            {Array.isArray(employees) &&
+            employees.map((employee) => (
 
               <option
                 key={employee.id}

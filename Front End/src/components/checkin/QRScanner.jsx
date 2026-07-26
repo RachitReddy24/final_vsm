@@ -98,18 +98,21 @@ function QRScanner({ onScan }) {
 
         <div className="overflow-hidden rounded-2xl border-2 border-cyan-500 bg-black">
 
-          <Scanner
-            onScan={handleScan}
-            onError={(err) => console.log(err)}
-            constraints={{
-              facingMode: "environment",
-            }}
-            styles={{
-              container: {
-                width: "100%",
-              },
-            }}
-          />
+<Scanner
+  onScan={handleScan}
+  onError={(err) => {
+    console.error("QR Scanner Error:", err);
+  }}
+  constraints={{
+    facingMode: "user",
+  }}
+  styles={{
+    container: {
+      width: "100%",
+      height: "400px",
+    },
+  }}
+/>
 
         </div>
 

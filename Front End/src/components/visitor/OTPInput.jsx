@@ -1,6 +1,51 @@
+import { useState } from "react";
 import Button from "../ui/Button";
+import api from "../../services/api";
 
-function OTPInput() {
+function OTPInput({ mobileNumber = "" }) {
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleVerifyOTP = async () => {
+    if (!otp) {
+      alert("Please enter OTP.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await api.post("/otp/verify", {
+        mobileNumber,
+        otp,
+      });
+
+      alert(response.data.message || "OTP verified successfully.");
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "OTP verification failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    try {
+      await api.post("/otp/send", {
+        mobileNumber,
+      });
+
+      alert("OTP sent successfully.");
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Failed to resend OTP."
+      );
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow border p-8 max-w-md mx-auto">
 
@@ -15,19 +60,22 @@ function OTPInput() {
       <input
         type="text"
         maxLength={6}
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
         placeholder="123456"
         className="w-full mt-8 border rounded-xl text-center text-3xl tracking-[12px] py-4 outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <div className="mt-8">
-
-        <Button>
-          Verify OTP
+        <Button onClick={handleVerifyOTP} disabled={loading}>
+          {loading ? "Verifying..." : "Verify OTP"}
         </Button>
-
       </div>
 
-      <button className="text-blue-600 mt-5 w-full">
+      <button
+        onClick={handleResendOTP}
+        className="text-blue-600 mt-5 w-full"
+      >
         Resend OTP
       </button>
 
