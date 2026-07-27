@@ -1,9 +1,12 @@
+import { useState } from "react";
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import VerificationCard from "../../components/visitor/VerificationCard";
 import VisitorDetailsCard from "../../components/visitor/VisitorDetailsCard";
 import { ShieldCheck } from "lucide-react";
 
 function VisitVerification() {
+  const [visitor, setVisitor] = useState(null);
+
   return (
     <ReceptionLayout>
       <div className="space-y-8">
@@ -13,7 +16,6 @@ function VisitVerification() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
 
           <div>
-
             <h1 className="text-4xl font-bold text-white">
               Visit Verification
             </h1>
@@ -21,13 +23,10 @@ function VisitVerification() {
             <p className="text-slate-400 mt-2">
               Verify visitors using QR Code or OTP before granting access.
             </p>
-
           </div>
 
           <div className="mt-5 lg:mt-0">
-
             <div className="inline-flex items-center gap-2 rounded-2xl bg-blue-500/10 border border-blue-500/30 px-5 py-3">
-
               <ShieldCheck
                 size={20}
                 className="text-blue-400"
@@ -36,9 +35,7 @@ function VisitVerification() {
               <span className="text-blue-300 font-semibold">
                 Security Verification
               </span>
-
             </div>
-
           </div>
 
         </div>
@@ -51,7 +48,9 @@ function VisitVerification() {
 
           <div className="xl:col-span-3">
 
-            <VerificationCard />
+            <VerificationCard
+              onVisitorVerified={setVisitor}
+            />
 
           </div>
 
@@ -59,7 +58,9 @@ function VisitVerification() {
 
           <div className="xl:col-span-2">
 
-            <VisitorDetailsCard />
+            <VisitorDetailsCard
+              visitor={visitor}
+            />
 
           </div>
 
