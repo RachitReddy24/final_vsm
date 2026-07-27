@@ -29,22 +29,24 @@ function PendingApprovals() {
     );
   }, [search, visitors]);
 
-  const fetchVisitors = async () => {
-    try {
-      setLoading(true);
+const fetchVisitors = async () => {
+  try {
+    setLoading(true);
 
-      const response = await api.get("/unplanned-visits");
+    const response = await api.get("/unplanned-visits");
 
-      setVisitors(response.data.data || []);
-      setFilteredVisitors(response.data.data || []);
-    } catch (error) {
-      console.error(error);
-      alert("Unable to load visitors.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("API Response:", response.data);
+    console.log("Visitors:", response.data.data);
 
+    setVisitors(response.data.data || []);
+    setFilteredVisitors(response.data.data || []);
+  } catch (error) {
+    console.error(error);
+    alert("Unable to load visitors.");
+  } finally {
+    setLoading(false);
+  }
+};
   const approveVisitor = async (id) => {
     try {
       await api.post(`/unplanned-visits/${id}/approve`);

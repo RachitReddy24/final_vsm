@@ -33,6 +33,9 @@ function VisitorOnboarding() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [idProof, setIdProof] = useState(null);
+
 
   useEffect(() => {
     fetchEmployees();
@@ -123,21 +126,30 @@ const fetchEmployees = async () => {
     try {
       setLoading(true);
 
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        mobileNumber: formData.mobileNumber,
-        company: formData.company,
-        designation: formData.designation,
-        purpose: formData.purpose,
-        hostId: Number(formData.hostId),
-      };
+const form = new FormData();
 
-      const response = await api.post(
-        "/unplanned-visits",
-        payload
-      );
+form.append("name", formData.name);
+form.append("email", formData.email);
+form.append("mobileNumber", formData.mobileNumber);
+form.append("company", formData.company);
+form.append("designation", formData.designation);
+form.append("purpose", formData.purpose);
+form.append("hostId", Number(formData.hostId));
 
+if (photo) {
+  form.append("photo", photo);
+}
+
+if (idProof) {
+  form.append("idProof", idProof);
+}
+for (const pair of form.entries()) {
+  console.log(pair[0], pair[1]);
+}
+const response = await api.post(
+  "/unplanned-visits",
+  form
+);
       alert(response.data.message);
 
       navigate("/reception/pending-approvals");
@@ -328,7 +340,9 @@ const fetchEmployees = async () => {
               type="button"
               className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-black transition"
             >
-              Open Camera
+              
+              open Camera
+              
             </button>
 
           </div>
@@ -343,8 +357,10 @@ const fetchEmployees = async () => {
 
           <input
             type="file"
-            className="w-full border rounded-xl p-3"
-          />
+            accept="image/*"
+            onChange={(e) => setIdProof(e.target.files[0])}
+             className="w-full border rounded-xl p-3"
+             />
 
         </div>
 

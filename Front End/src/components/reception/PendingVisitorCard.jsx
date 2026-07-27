@@ -14,7 +14,10 @@ function PendingVisitorCard({
   visitor,
   onApprove,
   onReject,
-}) {
+})
+ {
+  console.log("Visitor Card:", visitor);
+
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
 
@@ -22,8 +25,8 @@ function PendingVisitorCard({
 
         <div>
 
-          <h2 className="text-2xl font-bold">
-            {visitor.name}
+          <h2 className="text-2xl font-bold text-black">
+           {visitor.name}
           </h2>
 
           <ApprovalStatusBadge
@@ -42,9 +45,9 @@ function PendingVisitorCard({
             <p className="text-gray-500 text-sm">
               Mobile
             </p>
-            <p className="font-semibold">
-              {visitor.mobileNumber}
-            </p>
+            <p className="font-semibold text-black">
+             {visitor.mobileNumber}
+           </p>
           </div>
         </div>
 
@@ -54,8 +57,8 @@ function PendingVisitorCard({
             <p className="text-gray-500 text-sm">
               Company
             </p>
-            <p className="font-semibold">
-              {visitor.company}
+            <p className="font-semibold text-black">
+             {visitor.company}
             </p>
           </div>
         </div>
@@ -66,9 +69,9 @@ function PendingVisitorCard({
             <p className="text-gray-500 text-sm">
               Designation
             </p>
-            <p className="font-semibold">
-              {visitor.designation}
-            </p>
+            <p className="font-semibold text-black">
+            {visitor.designation}
+          </p>
           </div>
         </div>
 
@@ -78,9 +81,9 @@ function PendingVisitorCard({
             <p className="text-gray-500 text-sm">
               Host Employee
             </p>
-            <p className="font-semibold">
-              {visitor.host?.name || "Not Assigned"}
-            </p>
+           <p className="font-semibold text-black">
+           {visitor.host?.name || "Not Assigned"}
+          </p>
           </div>
         </div>
 
@@ -90,8 +93,8 @@ function PendingVisitorCard({
             <p className="text-gray-500 text-sm">
               Purpose
             </p>
-            <p className="font-semibold">
-              {visitor.purpose}
+           <p className="font-semibold text-black">
+             {visitor.purpose}
             </p>
           </div>
         </div>

@@ -81,7 +81,8 @@ const token = searchParams.get("token");
     }));
 
   };
- 
+ console.log("===== HANDLE SUBMIT CALLED =====");
+alert("RegistrationForm Submitted");
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -90,7 +91,15 @@ const handleSubmit = async (e) => {
 
     form.append("name", formData.fullName);
     form.append("email", formData.email);
-    form.append("mobileNumber", formData.mobile);
+
+
+const mobileNumber = formData.mobile
+  .replace(/\D/g, "")   // Remove everything except digits
+  .replace(/^91/, "");  // Remove country code if present
+
+console.log("Sending:", mobileNumber);
+
+form.append("mobileNumber", mobileNumber);
 
     form.append("company", formData.company);
     form.append("designation", "");
@@ -106,6 +115,11 @@ const handleSubmit = async (e) => {
     }
     console.log(photo);
     console.log(idProof);
+    console.log("Token:", token);
+
+for (const pair of form.entries()) {
+  console.log(pair[0], pair[1]);
+}
     const response = await registerVisitor(token, form);
 
     console.log(response);

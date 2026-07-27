@@ -4,7 +4,7 @@ const createUnplannedVisit = async (req, res) => {
   try {
 
     const visitor =
-      await unplannedVisitService.createUnplannedVisit(req.body);
+      await unplannedVisitService.createUnplannedVisit(req.body, req.files);
 
     res.status(201).json({
       success: true,

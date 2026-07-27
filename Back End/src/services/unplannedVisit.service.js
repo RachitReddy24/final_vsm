@@ -9,7 +9,7 @@ const { generateQRCode } = require("../utils/qr");
 const approvalTemplate = require("../templates/approval.template");
 const rejectionTemplate = require("../templates/rejection.template");
 
-const createUnplannedVisit = async (data) => {
+const createUnplannedVisit = async (data, files) => {
 
   // Check Host
   const host = await prisma.user.findUnique({
@@ -34,10 +34,19 @@ const createUnplannedVisit = async (data) => {
     "VIS" +
     crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    const photo = saveVisitorPhoto(
-  data.photo,
-  visitorCode
-);
+const photo = files?.photo?.[0]
+  ? `/uploads/visitors/${files.photo[0].filename}`
+  : null;
+
+const idProof = files?.idProof?.[0]
+  ? `/uploads/visitors/${files.idProof[0].filename}`
+  : null;
+
+console.log("Files:", files);
+console.log("Photo:", photo);
+console.log("ID Proof:", idProof);
+console.log("Data:", data);
+
 const approvalToken = crypto.randomBytes(32).toString("hex");
 const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -78,9 +87,9 @@ if (!otpRecord) {
 
       cameFrom: data.cameFrom,
 
-      photo: saveVisitorPhoto(data.photo, visitorCode),
+      photo: photo,
 
-      idProof: data.idProof,
+      idProof: idProof,
 
       visitType: "WALK_IN",
 

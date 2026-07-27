@@ -12,13 +12,12 @@ const createVisitorValidation = [
     .withMessage("Invalid email format"),
 
   body("mobileNumber")
-    .notEmpty()
-    .withMessage("Mobile number is required")
-    .isLength({ min: 10, max: 10 })
-    .withMessage("Mobile number must be 10 digits")
-    .isNumeric()
-    .withMessage("Mobile number must contain only numbers"),
-
+  .notEmpty()
+  .withMessage("Mobile number is required")
+  .matches(/^(\+91\s?)?[6-9]\d{9}$/)
+  .withMessage(
+    "Enter a valid Indian mobile number (e.g. 6300450242 or +91 6300450242)"
+  ),
   body("company")
     .notEmpty()
     .withMessage("Company is required"),

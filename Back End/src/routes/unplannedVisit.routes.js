@@ -6,7 +6,7 @@ const authorize = require("../middleware/role.middleware");
 
 const unplannedVisitController = require("../controllers/unplannedVisit.controller");
 const validate = require("../middleware/validation.middleware");
-
+const upload = require("../middleware/visitorUpload.middleware");
 const {
   createVisitorValidation,
 } = require("../validators/visitor.validator");
@@ -15,6 +15,24 @@ router.post(
   "/",
   authenticate,
   authorize("RECEPTIONIST", "ADMIN"),
+
+  (req, res, next) => {
+    console.log("Before Multer");
+    next();
+  },
+
+  upload.fields([
+    { name: "photo", maxCount: 1 },
+    { name: "idProof", maxCount: 1 },
+  ]),
+
+  (req, res, next) => {
+    console.log("After Multer");
+    console.log("req.files:", req.files);
+    console.log("req.body:", req.body);
+    next();
+  },
+
   createVisitorValidation,
   validate,
   unplannedVisitController.createUnplannedVisit

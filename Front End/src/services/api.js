@@ -2,9 +2,6 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api", // Change if your backend uses a different port
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Attach JWT token automatically
