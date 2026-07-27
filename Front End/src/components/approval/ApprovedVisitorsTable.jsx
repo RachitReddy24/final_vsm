@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 function ApprovedVisitorsTable({ approvedVisitors }) {
-
+console.log("Approved Visitors:", approvedVisitors);
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 

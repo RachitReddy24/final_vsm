@@ -51,7 +51,7 @@ function RejectModal({
             </p>
 
             <h3 className="text-white text-xl font-semibold">
-              {visitor?.visitor}
+              {visitor?.name}
             </h3>
 
           </div>
@@ -75,7 +75,7 @@ function RejectModal({
             </p>
 
             <h3 className="text-white">
-              {visitor?.host}
+              {visitor?.host?.name}
             </h3>
 
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import {
   Search,
   Bell,
@@ -46,37 +47,19 @@ function Header({
     navigate("/login", { replace: true });
   };
 
-  const notifications = [
-    {
-      id: 1,
-      title: "Visitor Approved",
-      time: "2 mins ago",
-      icon: CheckCircle2,
-      color: "text-green-400",
-    },
-    {
-      id: 2,
-      title: "Visitor Checked In",
-      time: "5 mins ago",
-      icon: UserPlus,
-      color: "text-cyan-400",
-    },
-    {
-      id: 3,
-      title: "OTP Verified",
-      time: "12 mins ago",
-      icon: ShieldCheck,
-      color: "text-purple-400",
-    },
-    {
-      id: 4,
-      title: "Meeting Completed",
-      time: "18 mins ago",
-      icon: Clock3,
-      color: "text-yellow-400",
-    },
-  ];
+  const [notifications, setNotifications] = useState([]);
+  const fetchNotifications = async () => {
+  try {
+    const res = await api.get("/notifications/all");
 
+    setNotifications(res.data.data.notifications);
+  } catch (error) {
+    console.error("Failed to fetch notifications:", error);
+  }
+};
+useEffect(() => {
+  fetchNotifications();
+}, []);
   return (
     <header className="sticky top-0 z-50 h-24 border-b border-slate-800 bg-slate-900/95 backdrop-blur-xl">
       <div className="h-full px-8 flex items-center justify-between">
@@ -123,10 +106,13 @@ function Header({
 
           <div className="relative">
 
-            <button
-              onClick={() => setShowNotification(!showNotification)}
-              className="relative w-12 h-12 rounded-2xl bg-slate-800 hover:bg-blue-600 transition flex items-center justify-center"
-            >
+                <button
+                  onClick={() => {
+                  fetchNotifications();
+                 setShowNotification(!showNotification);
+                }}
+               className="relative w-12 h-12 rounded-2xl bg-slate-800 hover:bg-blue-600 transition flex items-center justify-center"
+              >
               <Bell size={22} className="text-white" />
 
               <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 text-xs flex items-center justify-center font-bold">
@@ -147,7 +133,7 @@ function Header({
 
                   {notifications.map((item) => {
 
-                    const Icon = item.icon;
+                    const Icon = Bell;
 
                     return (
                       <div
@@ -158,7 +144,7 @@ function Header({
                         <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center">
                           <Icon
                             size={20}
-                            className={item.color}
+                            className="text-cyan-400"
                           />
                         </div>
 
@@ -168,7 +154,7 @@ function Header({
                           </h4>
 
                           <p className="text-slate-400 text-sm mt-1">
-                            {item.time}
+                            {new Date(item.createdAt).toLocaleString()}
                           </p>
                         </div>
 
