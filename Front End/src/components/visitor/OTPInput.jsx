@@ -1,12 +1,21 @@
 import { useState } from "react";
 import Button from "../ui/Button";
-import api from "../../services/api";
+import otpService from "../../services/otpService";
 
-function OTPInput({ mobileNumber = "" }) {
+function OTPInput({
+  mobileNumber = "",
+  onVerified,
+}) {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sendingOTP, setSendingOTP] = useState(false);
 
   const handleVerifyOTP = async () => {
+    if (!mobileNumber) {
+      alert("Mobile number is missing.");
+      return;
+    }
+
     if (!otp) {
       alert("Please enter OTP.");
       return;
@@ -15,12 +24,19 @@ function OTPInput({ mobileNumber = "" }) {
     try {
       setLoading(true);
 
-      const response = await api.post("/otp/verify", {
+      const response = await otpService.verifyOTP(
         mobileNumber,
-        otp,
-      });
+        otp
+      );
 
-      alert(response.data.message || "OTP verified successfully.");
+      alert(
+        response.data?.message ||
+          "OTP verified successfully."
+      );
+
+      if (onVerified) {
+        onVerified();
+      }
     } catch (error) {
       alert(
         error.response?.data?.message ||
@@ -32,17 +48,29 @@ function OTPInput({ mobileNumber = "" }) {
   };
 
   const handleResendOTP = async () => {
-    try {
-      await api.post("/otp/send", {
-        mobileNumber,
-      });
+    if (!mobileNumber) {
+      alert("Please enter mobile number.");
+      return;
+    }
 
-      alert("OTP sent successfully.");
+    try {
+      setSendingOTP(true);
+
+      const response = await otpService.sendOTP(
+        mobileNumber
+      );
+
+      alert(
+        response.data?.message ||
+          "OTP sent successfully."
+      );
     } catch (error) {
       alert(
         error.response?.data?.message ||
-          "Failed to resend OTP."
+          "Failed to send OTP."
       );
+    } finally {
+      setSendingOTP(false);
     }
   };
 
@@ -67,16 +95,20 @@ function OTPInput({ mobileNumber = "" }) {
       />
 
       <div className="mt-8">
-        <Button onClick={handleVerifyOTP} disabled={loading}>
+        <Button
+          onClick={handleVerifyOTP}
+          disabled={loading}
+        >
           {loading ? "Verifying..." : "Verify OTP"}
         </Button>
       </div>
 
       <button
         onClick={handleResendOTP}
-        className="text-blue-600 mt-5 w-full"
+        disabled={sendingOTP}
+        className="text-blue-600 mt-5 w-full disabled:opacity-50"
       >
-        Resend OTP
+        {sendingOTP ? "Sending..." : "Resend OTP"}
       </button>
 
     </div>

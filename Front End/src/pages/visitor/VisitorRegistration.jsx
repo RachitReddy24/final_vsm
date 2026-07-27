@@ -18,6 +18,7 @@ function VisitorRegistration() {
 
   useEffect(() => {
     if (token) {
+      // eslint-disable-next-line react-hooks/immutability
       fetchMeeting();
     }
   }, [token]);
