@@ -26,7 +26,6 @@ import PendingApprovals from "../pages/admin/PendingApprovals";
 
 import ReceptionDashboard from "../pages/reception/Dashboard";
 import VisitorOnboarding from "../pages/reception/VisitorOnboarding";
-import VisitVerification from "../pages/reception/VisitVerification";
 import VisitorStatus from "../pages/reception/VisitorStatus";
 import VisitorCheckIn from "../pages/reception/VisitorCheckIn";
 import VisitorCheckOut from "../pages/reception/VisitorCheckOut";
@@ -173,15 +172,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
             <VisitorOnboarding />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/reception/visit-verification"
-        element={
-          <ProtectedRoute roles={["RECEPTION", "RECEPTIONIST"]}>
-            <VisitVerification />
           </ProtectedRoute>
         }
       />

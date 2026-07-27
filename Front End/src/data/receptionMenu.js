@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   UserPlus,
-  ShieldCheck,
   LogIn,
   LogOut,
   ClipboardList,
@@ -17,11 +16,6 @@ const receptionMenu = [
     title: "Visitor Onboarding",
     icon: UserPlus,
     path: "/reception/visitor-onboarding",
-  },
-  {
-    title: "Visit Verification",
-    icon: ShieldCheck,
-    path: "/reception/visit-verification",
   },
   {
     title: "Visitor Check-In",
