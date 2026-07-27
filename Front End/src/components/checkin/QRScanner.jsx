@@ -20,7 +20,7 @@ function QRScanner({ onScan }) {
     if (!result || result.length === 0) return;
 
     const visitorCode = result[0].rawValue;
-
+    console.log("Scanned QR:", visitorCode);
     if (visitorCode === lastScan) return;
 
     try {
@@ -101,10 +101,11 @@ function QRScanner({ onScan }) {
 <Scanner
   onScan={handleScan}
   onError={(err) => {
-    console.error("QR Scanner Error:", err);
+    console.log(err);
   }}
   constraints={{
-    facingMode: "user",
+    width: { ideal: 640 },
+    height: { ideal: 480 },
   }}
   styles={{
     container: {

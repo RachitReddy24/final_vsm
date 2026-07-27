@@ -3,13 +3,15 @@ import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import VerificationCard from "../../components/visitor/VerificationCard";
 import VisitorDetailsCard from "../../components/visitor/VisitorDetailsCard";
 import VisitorBadgeCard from "../../components/visitor/VisitorBadgeCard";
-
+import { useState } from "react";
 import {
   LogIn,
   BadgeCheck,
 } from "lucide-react";
 
 function VisitorCheckIn() {
+  const [visitor, setVisitor] = useState(null);
+  console.log("Visitor in VisitorCheckIn:", visitor);
   return (
     <ReceptionLayout>
 
@@ -48,15 +50,21 @@ function VisitorCheckIn() {
 
         {/* Verification */}
 
-        <VerificationCard />
+        <VerificationCard
+  onVisitorVerified={setVisitor}
+/>
 
         {/* Visitor Details */}
 
-        <VisitorDetailsCard />
+        <VisitorDetailsCard
+  visitor={visitor}
+/>
 
         {/* Visitor Badge */}
 
-        <VisitorBadgeCard />
+        <VisitorBadgeCard
+  visitor={visitor}
+/>
 
         {/* Check-In Button */}
 

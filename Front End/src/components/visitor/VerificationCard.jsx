@@ -72,7 +72,7 @@ function VerificationCard({ onVisitorVerified }) {
           data.mobile ||
           ""
       );
-
+       console.log("Sending visitor to parent:", data);
       if (onVisitorVerified) {
         onVisitorVerified(data);
       }

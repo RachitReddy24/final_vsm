@@ -16,7 +16,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-function VisitorDetailsCard() {
+function VisitorDetailsCard({ visitor }) {
   const [status, setStatus] = useState("Pending Check-In");
 
   return (
@@ -76,11 +76,11 @@ function VisitorDetailsCard() {
             </div>
 
             <h2 className="text-white text-2xl font-bold mt-6">
-              Rahul Sharma
+              {visitor?.name || "--"}
             </h2>
 
             <p className="text-slate-400">
-              Visitor ID : VMS-2026-001
+              Visitor ID : {visitor?.visitorCode || "--"}
             </p>
 
             <div className="mt-6 w-full rounded-2xl bg-slate-800 border border-slate-700 p-5">
@@ -120,25 +120,25 @@ function VisitorDetailsCard() {
             <Info
               icon={Phone}
               label="Mobile"
-              value="9876543210"
+              value={visitor?.mobileNumber || "--"}
             />
 
             <Info
               icon={Building2}
               label="Company"
-              value="ABC Pvt Ltd"
+              value={visitor?.company || "--"}
             />
 
             <Info
               icon={Briefcase}
               label="Purpose"
-              value="Business Meeting"
+              value={visitor?.purpose || "--"}
             />
 
             <Info
               icon={User}
               label="Host"
-              value="John Doe"
+              value={visitor?.host?.name || "--"}
             />
 
             <Info
