@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 
 import api from "../../services/api";
-import { visitorDatabase } from "../../data/visitors";
 
 function Info({ icon: Icon, label, value }) {
   return (
@@ -50,42 +49,29 @@ function Info({ icon: Icon, label, value }) {
   );
 }
 
-function VisitorInfoCard({ visitorId }) {
+function VisitorInfoCard({ visitor }) {
+  console.log("VisitorInfoCard visitor:", visitor);
   const [processing, setProcessing] = useState(false);
 
-  const visitor =
-    visitorDatabase.find(
-      (item) =>
-        item.id === visitorId ||
-        item.meetingId === visitorId
-    ) || {
-      id: "Waiting for QR Scan",
-      meetingId: "--",
-      name: "--",
-      mobile: "--",
-      email: "--",
-      company: "--",
-      host: "--",
-      department: "--",
-      purpose: "--",
-      date: "--",
-      time: "--",
-      status: "Not Verified",
-      qrVerified: false,
-      checkInTime: "--",
-      image: "",
-    };
+   const visitorData = visitor || {
+  id: "",
+  visitorCode: "",
+  name: "--",
+  mobileNumber: "--",
+  email: "--",
+  company: "--",
+  purpose: "--",
+  status: "Not Verified",
+  host: {},
+  image: "",
+};
     const handleCheckIn = async () => {
-  if (!visitorId) return;
+  if (!visitor) return;
 
   try {
     setProcessing(true);
 
-    const visitorCode =
-      visitor.visitorCode ||
-      visitor.code ||
-      visitor.meetingId ||
-      visitor.id;
+const visitorCode = visitorData.visitorCode;
 
     const response = await api.post("/checkin", {
       visitorCode,
@@ -131,7 +117,7 @@ const handleReject = () => {
 
         <div
           className={`flex items-center gap-2 rounded-xl px-4 py-2 border ${
-            visitorId
+            visitor
               ? "bg-green-500/10 border-green-500/30"
               : "bg-yellow-500/10 border-yellow-500/30"
           }`}
@@ -140,7 +126,7 @@ const handleReject = () => {
           <CheckCircle2
             size={18}
             className={
-              visitorId
+              visitor
                 ? "text-green-400"
                 : "text-yellow-400"
             }
@@ -148,12 +134,12 @@ const handleReject = () => {
 
           <span
             className={`text-sm font-semibold ${
-              visitorId
+              visitor
                 ? "text-green-400"
                 : "text-yellow-400"
             }`}
           >
-            {visitorId ? "Visitor Found" : "Waiting"}
+            {visitor ? "Visitor Found" : "Waiting"}
           </span>
 
         </div>
@@ -166,12 +152,10 @@ const handleReject = () => {
 
         <div className="w-28 h-28 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
 
-          {visitor.image ? (
-
-            <img
-              src={visitor.image}
-              alt={visitor.name}
-              className="w-full h-full object-cover"
+         {visitorData.image ? (
+  <img
+    src={visitorData.image}
+    alt={visitorData.name}
             />
 
           ) : (
@@ -186,11 +170,11 @@ const handleReject = () => {
         </div>
 
         <h3 className="text-white text-2xl font-bold mt-5">
-          {visitor.name}
+          {visitorData.name}
         </h3>
 
         <p className="text-cyan-400 mt-1">
-          {visitor.meetingId}
+          {visitorData.visitorCode}
         </p>
 
       </div>
@@ -200,59 +184,64 @@ const handleReject = () => {
       <div className="grid gap-4 px-6">
 
         <Info
-          icon={Phone}
-          label="Mobile"
-          value={visitor.mobile}
-        />
+  icon={Phone}
+  label="Mobile"
+  value={visitorData.mobileNumber}
+/>
 
-        <Info
-          icon={Mail}
-          label="Email"
-          value={visitor.email}
-        />
+<Info
+  icon={Mail}
+  label="Email"
+  value={visitorData.email}
+/>
 
-        <Info
-          icon={Building2}
-          label="Company"
-          value={visitor.company}
-        />
+<Info
+  icon={Building2}
+  label="Company"
+  value={visitorData.company}
+/>
 
-        <Info
-          icon={User}
-          label="Host"
-          value={visitor.host}
-        />
+<Info
+  icon={User}
+  label="Host"
+  value={visitorData.host?.name}
+/>
 
-        <Info
-          icon={Building2}
-          label="Department"
-          value={visitor.department}
-        />
+<Info
+  icon={Briefcase}
+  label="Purpose"
+  value={visitorData.purpose}
+/>
 
-        <Info
-          icon={Briefcase}
-          label="Purpose"
-          value={visitor.purpose}
-        />
+<Info
+  icon={Calendar}
+  label="Visit Date"
+  value={
+    visitorData.createdAt
+      ? new Date(visitorData.createdAt).toLocaleDateString()
+      : "--"
+  }
+/>
 
-        <Info
-          icon={Calendar}
-          label="Visit Date"
-          value={visitor.date}
-        />
+<Info
+  icon={Clock}
+  label="Visit Time"
+  value={
+    visitorData.createdAt
+      ? new Date(visitorData.createdAt).toLocaleTimeString()
+      : "--"
+  }
+/>
 
-        <Info
-          icon={Clock}
-          label="Visit Time"
-          value={visitor.time}
-        />
-
-        <Info
-          icon={Timer}
-          label="Check-In"
-          value={visitor.checkInTime}
-        />
-
+<Info
+  icon={Timer}
+  label="Check-In"
+  value={
+    visitorData.checkedInAt
+      ? new Date(visitorData.checkedInAt).toLocaleTimeString()
+      : "--"
+  }
+/>
       </div>
 
       {/* Status */}
@@ -272,7 +261,7 @@ const handleReject = () => {
               </p>
 
               <h3 className="text-white font-semibold mt-1">
-                {visitor.status}
+                {visitorData.status}
               </h3>
 
             </div>
@@ -285,13 +274,11 @@ const handleReject = () => {
 
           <div className="flex items-center gap-3">
 
-            <ShieldCheck
-              className={
-                visitor.qrVerified
-                  ? "text-green-400"
-                  : "text-red-400"
-              }
-            />
+           <ShieldCheck className="text-green-400" />
+
+<h3 className="text-white font-semibold mt-1">
+  Verified
+</h3>
 
             <div>
 
@@ -300,10 +287,8 @@ const handleReject = () => {
               </p>
 
               <h3 className="text-white font-semibold mt-1">
-                {visitor.qrVerified
-                  ? "Verified"
-                  : "Pending"}
-              </h3>
+              {visitorData.qrCode ? "Verified" : "Pending"}
+            </h3>
 
             </div>
 
@@ -319,9 +304,9 @@ const handleReject = () => {
 
   <button
     onClick={handleCheckIn}
-    disabled={!visitorId || processing}
+    disabled={!visitor || processing}
     className={`rounded-2xl py-4 text-white font-semibold transition ${
-      visitorId
+      visitor
         ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:scale-105"
         : "bg-slate-700 cursor-not-allowed"
     }`}
@@ -331,9 +316,9 @@ const handleReject = () => {
 
   <button
     onClick={handleReject}
-    disabled={!visitorId}
+    disabled={!visitor}
     className={`rounded-2xl py-4 text-white font-semibold transition ${
-      visitorId
+      visitor
         ? "bg-gradient-to-r from-red-600 to-rose-500 hover:scale-105"
         : "bg-slate-700 cursor-not-allowed"
     }`}

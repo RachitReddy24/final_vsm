@@ -54,12 +54,23 @@ function VisitorCheckIn() {
   onVisitorVerified={setVisitor}
 />
 
-        {/* Visitor Details */}
+{/* Visitor Details */}
 
-        <VisitorDetailsCard
+<pre
+  style={{
+    color: "white",
+    background: "#111",
+    padding: "10px",
+    borderRadius: "8px",
+    overflow: "auto",
+  }}
+>
+  {JSON.stringify(visitor, null, 2)}
+</pre>
+
+<VisitorDetailsCard
   visitor={visitor}
 />
-
         {/* Visitor Badge */}
 
         <VisitorBadgeCard

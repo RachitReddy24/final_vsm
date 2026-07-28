@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 function VisitorDetailsCard({ visitor }) {
+  console.log("VisitorDetailsCard visitor:", visitor);
   const [status, setStatus] = useState("Pending Check-In");
 
   return (

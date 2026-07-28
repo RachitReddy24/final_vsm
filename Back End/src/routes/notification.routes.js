@@ -13,7 +13,7 @@ router.get(
 router.get(
   "/all",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN","RECEPTIONIST"),
   notificationController.getAllNotifications
 );
 router.put(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
@@ -8,8 +8,11 @@ import CameraPreview from "../../components/camera/CameraPreview";
 import VisitorInfoCard from "../../components/checkin/VisitorInfoCard";
 
 function VisitorCheckIn() {
-  const [visitorId, setVisitorId] = useState("");
+const [visitor, setVisitor] = useState(null);
 
+useEffect(() => {
+  console.log("Visitor state changed:", visitor);
+}, [visitor]);
   return (
     <ReceptionLayout>
       <div className="space-y-8">
@@ -54,9 +57,12 @@ function VisitorCheckIn() {
         <div className="grid xl:grid-cols-3 gap-8">
 
           <div className="xl:col-span-1">
-            <QRScanner
-              onScan={(data) => setVisitorId(data)}
-            />
+           <QRScanner
+  onScan={(data) => {
+    console.log("Received from QRScanner:", data);
+    setVisitor(data);
+  }}
+/>
           </div>
 
           <div className="xl:col-span-1">
@@ -65,7 +71,7 @@ function VisitorCheckIn() {
 
           <div className="xl:col-span-1">
             <VisitorInfoCard
-              visitorId={visitorId}
+              visitor={visitor}
             />
           </div>
 

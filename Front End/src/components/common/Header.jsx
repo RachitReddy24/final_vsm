@@ -48,10 +48,9 @@ function Header({
   };
 
   const [notifications, setNotifications] = useState([]);
-  const fetchNotifications = async () => {
+const fetchNotifications = async () => {
   try {
     const res = await api.get("/notifications/all");
-
     setNotifications(res.data.data.notifications);
   } catch (error) {
     console.error("Failed to fetch notifications:", error);

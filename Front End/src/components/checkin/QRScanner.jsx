@@ -26,15 +26,18 @@ function QRScanner({ onScan }) {
     try {
       setLoading(true);
 
-      const response = await api.post("/checkin/verify-qr", {
-        visitorCode,
-      });
+const response = await api.post("/checkin/verify-qr", {
+  visitorCode,
+});
 
-      setLastScan(visitorCode);
-      setScanned(true);
+console.log("Full API Response:", response.data);
+console.log("Visitor Data:", response.data.data);
 
-      // Send verified visitor object to parent
-      onScan(response.data.data);
+setLastScan(visitorCode);
+setScanned(true);
+
+console.log("Calling parent with:", response.data.data);
+onScan(response.data.data);
 
     } catch (error) {
       alert(
