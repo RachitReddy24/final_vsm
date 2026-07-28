@@ -10,7 +10,18 @@ import {
   BadgeCheck,
 } from "lucide-react";
 
-function VisitorCheckoutCard() {
+function VisitorCheckoutCard({
+  search,
+  setSearch,
+  visitor,
+  loading,
+  feedback,
+  setFeedback,
+  onSearch,
+  onCheckout,
+  onBack,
+}) {
+  console.log("VisitorCheckoutCard visitor:", visitor);
   return (
     <motion.div
       initial={{ opacity: 0, x: -30 }}
@@ -24,6 +35,52 @@ function VisitorCheckoutCard() {
       shadow-xl
       "
     >
+      {/* Search Visitor */}
+
+<div className="mb-8">
+
+  <label className="block text-slate-300 mb-2 font-medium">
+    Visitor Code
+  </label>
+
+  <div className="flex gap-3">
+
+    <input
+      type="text"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      placeholder="Enter Visitor Code"
+      className="
+        flex-1
+        px-4
+        py-3
+        rounded-xl
+        bg-slate-800
+        border
+        border-slate-700
+        text-white
+        outline-none
+      "
+    />
+
+    <button
+      onClick={onSearch}
+      disabled={loading}
+      className="
+        bg-cyan-600
+        hover:bg-cyan-700
+        px-6
+        rounded-xl
+        text-white
+        font-semibold
+      "
+    >
+      {loading ? "Searching..." : "Search"}
+    </button>
+
+  </div>
+
+</div>
       {/* Header */}
 
       <div className="flex items-center gap-5">
@@ -50,19 +107,18 @@ function VisitorCheckoutCard() {
         <div>
 
           <h2 className="text-3xl font-bold text-white">
-            Rahul Sharma
+            {visitor?.name || "No Visitor Selected"}
           </h2>
 
           <p className="text-slate-400 mt-1">
-            Visitor ID : VMS-2026-001
+           Visitor ID : {visitor?.visitorCode || "-"}
           </p>
 
           <span className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-green-500/20 text-green-400">
 
             <BadgeCheck size={18} />
 
-            Checked-In
-
+          {visitor?.status || "NOT FOUND"}
           </span>
 
         </div>
@@ -76,39 +132,58 @@ function VisitorCheckoutCard() {
         <InfoCard
           icon={Phone}
           label="Mobile"
-          value="9876543210"
+          value={visitor?.mobileNumber || "-"}
         />
 
         <InfoCard
           icon={Building2}
           label="Company"
-          value="ABC Pvt Ltd"
+          value={visitor?.company || "-"}
         />
 
         <InfoCard
           icon={User}
           label="Host"
-          value="John Doe"
+          value={visitor?.host?.name || "-"}
         />
 
-        <InfoCard
-          icon={Briefcase}
-          label="Department"
-          value="IT Department"
-        />
 
         <InfoCard
           icon={CalendarDays}
           label="Check-In Date"
-          value="16 Jul 2026"
-        />
+value={
+  visitor?.checkedInAt
+    ? new Date(visitor.checkedInAt).toLocaleDateString()
+    : "-"
+}        />
 
         <InfoCard
           icon={Clock3}
           label="Check-In Time"
-          value="10:30 AM"
-        />
+value={
+  visitor?.checkedInAt
+    ? new Date(visitor.checkedInAt).toLocaleTimeString()
+    : "-"
+}        />
 
+            </div>
+
+      {/* Checkout Button */}
+      <div className="flex justify-end mt-8">
+        <button
+          onClick={onCheckout}
+          disabled={!visitor || loading}
+          className={`
+            px-6 py-3 rounded-xl font-semibold text-white transition
+            ${
+              !visitor || loading
+                ? "bg-slate-600 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700"
+            }
+          `}
+        >
+          {loading ? "Processing..." : "Check Out"}
+        </button>
       </div>
 
     </motion.div>

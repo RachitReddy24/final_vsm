@@ -10,7 +10,8 @@ import { Link } from "react-router-dom";
 function CheckoutSuccessModal({
   isOpen,
   onClose,
-}) {
+  visitor,
+})  {
   return (
     <AnimatePresence>
 
@@ -117,30 +118,44 @@ function CheckoutSuccessModal({
 
               <SummaryRow
                 label="Visitor"
-                value="Rahul Sharma"
+                value={visitor?.name || "--"}
               />
 
               <SummaryRow
                 label="Host"
-                value="John Doe"
+                value={visitor?.host?.name || "--"}
               />
 
-              <SummaryRow
-                label="Department"
-                value="IT Department"
-              />
+              
 
-              <SummaryRow
-                label="Exit Time"
-                value="04:45 PM"
-                icon={<Clock3 size={18} />}
+             <SummaryRow
+              label="Exit Time"
+              value={
+              visitor?.checkedOutAt
+              ? new Date(visitor.checkedOutAt).toLocaleTimeString()
+              : new Date().toLocaleTimeString()
+              }
+              icon={<Clock3 size={18} />}
               />
+             <SummaryRow
+  label="Duration"
+  value={
+    visitor?.checkedInAt && visitor?.checkedOutAt
+      ? (() => {
+          const diff =
+            new Date(visitor.checkedOutAt) -
+            new Date(visitor.checkedInAt);
 
-              <SummaryRow
-                label="Duration"
-                value="6 Hours 15 Minutes"
-              />
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor(
+            (diff % (1000 * 60 * 60)) / (1000 * 60)
+          );
 
+          return `${hours}h ${minutes}m`;
+        })()
+      : "--"
+  }
+/>
             </div>
 
             {/* Buttons */}

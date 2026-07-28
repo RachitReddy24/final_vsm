@@ -81,11 +81,7 @@ function MeetingSummary({ visitor }) {
 
       <div className="space-y-5 mt-8">
 
-        <Detail
-          icon={Briefcase}
-          label="Meeting Title"
-          value={visitor.meeting?.title || "--"}
-        />
+        
 
         <Detail
           icon={Briefcase}
@@ -103,37 +99,7 @@ function MeetingSummary({ visitor }) {
           value={visitor.host?.name || "--"}
         />
 
-        <Detail
-          icon={Building2}
-          label="Department"
-          value={
-            visitor.host?.department?.name ||
-            visitor.department ||
-            "--"
-          }
-        />
-
-        <Detail
-          icon={MapPin}
-          label="Meeting Room"
-          value={
-            visitor.meeting?.room ||
-            visitor.meetingRoom ||
-            "--"
-          }
-        />
-
-        <Detail
-          icon={CalendarDays}
-          label="Meeting Date"
-          value={
-            visitor.visitDate
-              ? new Date(
-                  visitor.visitDate
-                ).toLocaleDateString()
-              : "--"
-          }
-        />
+        
 
         <Detail
           icon={Clock3}

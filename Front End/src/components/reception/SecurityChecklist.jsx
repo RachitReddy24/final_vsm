@@ -43,20 +43,19 @@ const checklist = [
 ];
 
 function SecurityChecklist({
-  security = {},
-  setSecurity,
+  securityChecklist = {},
+  setSecurityChecklist,
 }) {
   const toggleItem = (key) => {
-    if (!setSecurity) return;
+    if (!setSecurityChecklist) return;
 
-    setSecurity((prev = {}) => ({
+    setSecurityChecklist((prev = {}) => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
 
-  const completedCount = Object.values(security ?? {}).filter(Boolean).length;
-
+const completedCount = Object.values(securityChecklist ?? {}).filter(Boolean).length;
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
@@ -92,7 +91,7 @@ function SecurityChecklist({
       <div className="space-y-4 mt-8">
         {checklist.map((item) => {
           const Icon = item.icon;
-          const verified = security?.[item.key] ?? false;
+          const verified = securityChecklist?.[item.key] ?? false;
 
           return (
             <button
