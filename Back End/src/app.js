@@ -1,3 +1,4 @@
+const uploadRoutes = require("./routes/upload.route");
 console.log("__dirname =", __dirname);
 const express = require("express");
 const cors = require("cors");
@@ -41,4 +42,5 @@ app.use("/api/feedback",require("./routes/feedback.routes"));
 app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/visitor-pass",require("./routes/visitorPass.routes"));
 app.use("/api/profile",require("./routes/profile.routes"));
+app.use("/api/upload", uploadRoutes);
 module.exports = app;
