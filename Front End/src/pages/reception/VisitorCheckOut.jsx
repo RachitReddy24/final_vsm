@@ -18,53 +18,54 @@ function VisitorCheckOut() {
 
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
   const [search, setSearch] = useState("");
   const [visitor, setVisitor] = useState(null);
-  const [feedback, setFeedback] = useState("");
+    console.log("Visitor State:", visitor);
 
-  const [items, setItems] = useState({
-    laptop: false,
-    visitorBadge: false,
-    idCard: false,
-    parkingToken: false,
-  });
+ const [feedback, setFeedback] = useState("");
 
-  const [securityChecklist, setSecurityChecklist] = useState({
-    bagChecked: false,
-    accessCardReturned: false,
-    escortCompleted: false,
-  });
+const [items, setItems] = useState({
+  laptop: false,
+  visitorBadge: false,
+  idCard: false,
+  parkingToken: false,
+});
 
-  const [remarks, setRemarks] = useState("");
+const [securityChecklist, setSecurityChecklist] = useState({
+  identityVerified: false,
+  hostApproved: false,
+  qrScanned: false,
+  assetsReturned: false,
+  signatureCollected: false,
+});
 
-  const handleSearch = async () => {
-    if (!search.trim()) {
-      alert("Please enter Visitor Code");
-      return;
-    }
+const [remarks, setRemarks] = useState({
+  exitCondition: "Normal Exit",
+  notes: "",
+  incident: "",
+});
 
-    try {
-      setLoading(true);
+const handleSearch = async () => {
+  if (!search.trim()) {
+    alert("Please enter Visitor Code");
+    return;
+  }
 
-      const response = await api.get(
-        `/checkin/status/${search}`
-      );
+  try {
+    setLoading(true);
 
-      setVisitor(response.data.data);
+    const response = await api.get(`/checkin/status/${search}`);
 
-    } catch (error) {
-      setVisitor(null);
+    console.log("Search Response:", response.data);
 
-      alert(
-        error.response?.data?.message ||
-        "Visitor not found."
-      );
-
-    } finally {
-      setLoading(false);
-    }
-  };
+    setVisitor(response.data.data);
+  } catch (error) {
+    console.error(error);
+    setVisitor(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCheckout = async () => {
     if (!visitor) {
@@ -83,9 +84,27 @@ function VisitorCheckOut() {
 
       setShowSuccess(true);
 
-      setVisitor(null);
-      setSearch("");
-      setFeedback("");
+  
+setItems({
+  laptop: false,
+  visitorBadge: false,
+  idCard: false,
+  parkingToken: false,
+});
+
+setSecurityChecklist({
+  identityVerified: false,
+  hostApproved: false,
+  qrScanned: false,
+  assetsReturned: false,
+  signatureCollected: false,
+});
+
+setRemarks({
+  exitCondition: "Normal Exit",
+  notes: "",
+  incident: "",
+});
 
     } catch (error) {
 
@@ -143,10 +162,39 @@ function VisitorCheckOut() {
 
   </div>
 
-  <CheckoutSuccessModal
-    isOpen={showSuccess}
-    onClose={() => setShowSuccess(false)}
-  />
+<CheckoutSuccessModal
+  isOpen={showSuccess}
+  visitor={visitor}
+  onClose={() => {
+    setShowSuccess(false);
+
+    setVisitor(null);
+    setSearch("");
+    setFeedback("");
+
+    setItems({
+      laptop: false,
+      visitorBadge: false,
+      idCard: false,
+      parkingToken: false,
+    });
+
+    setSecurityChecklist({
+      identityVerified: false,
+      hostApproved: false,
+      qrScanned: false,
+      assetsReturned: false,
+      signatureCollected: false,
+    });
+
+    setRemarks({
+      exitCondition: "Normal Exit",
+      notes: "",
+      incident: "",
+    });
+  }}
+/>
+
 </ReceptionLayout>
   );
 }

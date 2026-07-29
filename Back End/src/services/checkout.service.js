@@ -34,8 +34,7 @@ const checkOutVisitor = async (visitorId) => {
 
   if (visitor.checkOut)
     throw new Error("Visitor already checked out");
-if (visitor.checkOut)
-  throw new Error("Visitor already checked out");
+
   // Create checkout record
   const checkOut = await prisma.checkOut.create({
 

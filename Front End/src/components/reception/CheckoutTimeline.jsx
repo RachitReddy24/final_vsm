@@ -8,53 +8,48 @@ import {
   LogOut,
 } from "lucide-react";
 
-const timeline = [
-  {
-    title: "Visitor Registered",
-    time: "09:45 AM",
-    description: "Visitor registration completed.",
-    icon: UserPlus,
-    color: "bg-cyan-500",
-  },
-  {
-    title: "QR / OTP Verified",
-    time: "09:47 AM",
-    description: "Visitor identity successfully verified.",
-    icon: QrCode,
-    color: "bg-violet-500",
-  },
-  {
-    title: "Checked-In",
-    time: "09:50 AM",
-    description: "Visitor entered the premises.",
-    icon: LogIn,
-    color: "bg-green-500",
-  },
-  {
-    title: "Meeting Started",
-    time: "10:00 AM",
-    description: "Host received the visitor.",
-    icon: Users,
-    color: "bg-blue-500",
-  },
-  {
-    title: "Meeting Completed",
-    time: "11:20 AM",
-    description: "Meeting finished successfully.",
-    icon: CheckCircle2,
-    color: "bg-emerald-500",
-  },
-  {
-    title: "Ready for Check-Out",
-    time: "11:25 AM",
-    description: "Waiting for receptionist confirmation.",
-    icon: LogOut,
-    color: "bg-red-500",
-    active: true,
-  },
-];
 
-function CheckoutTimeline() {
+
+function CheckoutTimeline({ visitor }) {
+  const timeline = visitor
+  ? [
+      {
+        title: "Visitor Registered",
+        time: visitor.createdAt
+          ? new Date(visitor.createdAt).toLocaleTimeString()
+          : "--",
+        description: "Visitor registration completed.",
+        icon: UserPlus,
+        color: "bg-cyan-500",
+      },
+      {
+        title: "Checked-In",
+        time: visitor.checkedInAt
+          ? new Date(visitor.checkedInAt).toLocaleTimeString()
+          : "--",
+        description: "Visitor entered the premises.",
+        icon: LogIn,
+        color: "bg-green-500",
+      },
+      {
+        title: "Meeting In Progress",
+        time: visitor.checkedInAt
+          ? new Date(visitor.checkedInAt).toLocaleTimeString()
+          : "--",
+        description: visitor.purpose || "Meeting with host",
+        icon: Users,
+        color: "bg-blue-500",
+      },
+      {
+        title: "Ready for Check-Out",
+        time: "--",
+        description: "Waiting for receptionist confirmation.",
+        icon: LogOut,
+        color: "bg-red-500",
+        active: true,
+      },
+    ]
+  : [];
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -79,7 +74,11 @@ function CheckoutTimeline() {
         </p>
 
       </div>
-
+      {!visitor ? (
+  <div className="py-16 text-center text-slate-400">
+    Search a visitor to view the activity timeline.
+  </div>
+) : (
       <div className="relative">
 
         <div className="absolute left-6 top-0 bottom-0 w-[2px] bg-slate-700" />
@@ -150,7 +149,9 @@ function CheckoutTimeline() {
         </div>
 
       </div>
+)}
     </motion.div>
+        
   );
 }
 
