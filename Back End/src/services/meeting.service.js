@@ -602,7 +602,7 @@ const visitor = await prisma.visitor.create({
 
     idProof: idProofFile ? idProofFile.filename : null,
     visitType: "PLANNED",
-    status: "PENDING",
+    status: "APPROVED",
   },
 
   include: {

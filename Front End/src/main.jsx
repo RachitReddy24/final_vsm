@@ -6,29 +6,32 @@ import { Toaster } from "react-hot-toast";
 import App from "./App";
 import "./index.css";
 
+import { ThemeProvider } from "./context/ThemeContext";
 import { SidebarProvider } from "./context/SidebarContext";
 import { MeetingProvider } from "./context/MeetingContext";
 import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <SidebarProvider>
-          <MeetingProvider>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <SidebarProvider>
+            <MeetingProvider>
 
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 3000,
-              }}
-            />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                }}
+              />
 
-            <App />
+              <App />
 
-          </MeetingProvider>
-        </SidebarProvider>
-      </AuthProvider>
-    </BrowserRouter>
+            </MeetingProvider>
+          </SidebarProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>
 );

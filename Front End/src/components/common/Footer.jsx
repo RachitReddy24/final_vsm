@@ -82,7 +82,7 @@ function Footer() {
                 />
 
                 <span className="text-slate-300">
-                  support@s3dtechnologies.com
+                  testmail.s3dtechnology@gmail.com
                 </span>
 
               </div>
