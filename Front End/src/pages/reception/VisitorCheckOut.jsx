@@ -7,10 +7,7 @@ import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import CheckoutHeader from "../../components/reception/CheckoutHeader";
 import VisitorCheckoutCard from "../../components/reception/VisitorCheckoutCard";
 import MeetingSummary from "../../components/reception/MeetingSummary";
-import ItemsChecklist from "../../components/reception/ItemsChecklist";
-import SecurityChecklist from "../../components/reception/SecurityChecklist";
 import ExitRemarks from "../../components/reception/ExitRemarks";
-import CheckoutTimeline from "../../components/reception/CheckoutTimeline";
 import CheckoutSuccessModal from "../../components/reception/CheckoutSuccessModal";
 
 function VisitorCheckOut() {
@@ -18,54 +15,45 @@ function VisitorCheckOut() {
 
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
   const [search, setSearch] = useState("");
   const [visitor, setVisitor] = useState(null);
-    console.log("Visitor State:", visitor);
 
- const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState("");
 
-const [items, setItems] = useState({
-  laptop: false,
-  visitorBadge: false,
-  idCard: false,
-  parkingToken: false,
-});
+  const [remarks, setRemarks] = useState({
+    rating: 5,
+    exitCondition: "Normal Exit",
+    notes: "",
+    incident: "",
+  });
 
-const [securityChecklist, setSecurityChecklist] = useState({
-  identityVerified: false,
-  hostApproved: false,
-  qrScanned: false,
-  assetsReturned: false,
-  signatureCollected: false,
-});
+  const handleSearch = async () => {
+    if (!search.trim()) {
+      alert("Please enter Visitor Code");
+      return;
+    }
 
-const [remarks, setRemarks] = useState({
-  exitCondition: "Normal Exit",
-  notes: "",
-  incident: "",
-});
+    try {
+      setLoading(true);
 
-const handleSearch = async () => {
-  if (!search.trim()) {
-    alert("Please enter Visitor Code");
-    return;
-  }
+      const response = await api.get(`/checkin/status/${search}`);
 
-  try {
-    setLoading(true);
+      console.log("Search Response:", response.data);
 
-    const response = await api.get(`/checkin/status/${search}`);
+      setVisitor(response.data.data);
+    } catch (error) {
+      console.error(error);
+      setVisitor(null);
 
-    console.log("Search Response:", response.data);
-
-    setVisitor(response.data.data);
-  } catch (error) {
-    console.error(error);
-    setVisitor(null);
-  } finally {
-    setLoading(false);
-  }
-};
+      alert(
+        error.response?.data?.message ||
+          "Visitor not found."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCheckout = async () => {
     if (!visitor) {
@@ -77,144 +65,120 @@ const handleSearch = async () => {
       setLoading(true);
 
       const response = await api.post(
-        `/checkout/${visitor.id}`
+        `/checkout/${visitor.id}`,
+        {
+          exitCondition: remarks.exitCondition,
+          notes: remarks.notes,
+          incident: remarks.incident,
+        }
       );
 
-      alert(response.data.message);
+      alert(
+        response.data?.message ||
+          "Visitor checked out successfully."
+      );
 
-      setShowSuccess(true);
-
-  
-setItems({
-  laptop: false,
-  visitorBadge: false,
-  idCard: false,
-  parkingToken: false,
-});
-
-setSecurityChecklist({
-  identityVerified: false,
-  hostApproved: false,
-  qrScanned: false,
-  assetsReturned: false,
-  signatureCollected: false,
-});
-
-setRemarks({
-  exitCondition: "Normal Exit",
-  notes: "",
-  incident: "",
-});
-
+      setVisitor((prev) => ({
+        ...prev,
+        status: "CHECKED_OUT",
+      }));
     } catch (error) {
+      console.error(error);
 
       alert(
         error.response?.data?.message ||
-        "Checkout failed."
+          "Checkout failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async () => {
+    if (!visitor) {
+      alert("Please search a visitor first.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await api.post(
+        `/feedback/${visitor.id}`,
+        {
+          rating: remarks.rating,
+          comments: remarks.notes,
+        }
       );
 
+      alert(response.data.data.message);
+
+      setShowSuccess(true);
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to submit feedback."
+      );
     } finally {
-
       setLoading(false);
-
     }
   };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleNotify = () => {
-    alert("Host notified successfully.");
-  };
-
-  const handleCancel = () => {
-    if (
-      window.confirm(
-        "Cancel checkout?"
-      )
-    ) {
-      navigate("/reception/dashboard");
-    }
-  };
-
-  return (
+    return (
     <ReceptionLayout>
-  <div className="space-y-8">
+      <div className="space-y-8">
 
-    <CheckoutHeader />
+        <CheckoutHeader />
 
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
-      <VisitorCheckoutCard
-        search={search}
-        setSearch={setSearch}
+          <VisitorCheckoutCard
+            search={search}
+            setSearch={setSearch}
+            visitor={visitor}
+            loading={loading}
+            feedback={feedback}
+            setFeedback={setFeedback}
+            onSearch={handleSearch}
+            onCheckout={handleCheckout}
+            onBack={() => navigate("/reception/dashboard")}
+          />
+
+          <MeetingSummary visitor={visitor} />
+
+          <ExitRemarks
+            remarks={remarks}
+            setRemarks={setRemarks}
+            onSubmit={handleFeedbackSubmit}
+            loading={loading}
+          />
+
+        </div>
+
+      </div>
+
+      <CheckoutSuccessModal
+        isOpen={showSuccess}
         visitor={visitor}
-        loading={loading}
-        feedback={feedback}
-        setFeedback={setFeedback}
-        onSearch={handleSearch}
-        onCheckout={handleCheckout}
-        onBack={() => navigate("/reception/dashboard")}
+        onClose={() => {
+          setShowSuccess(false);
+
+          setVisitor(null);
+          setSearch("");
+          setFeedback("");
+
+          setRemarks({
+            rating: 5,
+            exitCondition: "Normal Exit",
+            notes: "",
+            incident: "",
+          });
+        }}
       />
 
-      <MeetingSummary visitor={visitor} />
-
-      <ItemsChecklist
-        items={items}
-        setItems={setItems}
-      />
-
-      <SecurityChecklist
-        securityChecklist={securityChecklist}
-        setSecurityChecklist={setSecurityChecklist}
-      />
-
-      <ExitRemarks
-        remarks={remarks}
-        setRemarks={setRemarks}
-      />
-
-    </div>
-
-    <CheckoutTimeline visitor={visitor} />
-
-  </div>
-
-<CheckoutSuccessModal
-  isOpen={showSuccess}
-  visitor={visitor}
-  onClose={() => {
-    setShowSuccess(false);
-
-    setVisitor(null);
-    setSearch("");
-    setFeedback("");
-
-    setItems({
-      laptop: false,
-      visitorBadge: false,
-      idCard: false,
-      parkingToken: false,
-    });
-
-    setSecurityChecklist({
-      identityVerified: false,
-      hostApproved: false,
-      qrScanned: false,
-      assetsReturned: false,
-      signatureCollected: false,
-    });
-
-    setRemarks({
-      exitCondition: "Normal Exit",
-      notes: "",
-      incident: "",
-    });
-  }}
-/>
-
-</ReceptionLayout>
+    </ReceptionLayout>
   );
 }
+
 export default VisitorCheckOut;

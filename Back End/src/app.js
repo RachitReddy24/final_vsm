@@ -20,7 +20,6 @@ app.get("/", (req, res) => {
     message: "Visitor Management System Backend Running",
   });
 });
-
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/departments", require("./routes/department.routes"));
 app.use("/api/employees", require("./routes/employee.routes"));

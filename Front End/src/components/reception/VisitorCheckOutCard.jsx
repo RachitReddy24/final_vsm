@@ -4,7 +4,6 @@ import {
   Phone,
   Building2,
   User,
-  Briefcase,
   CalendarDays,
   Clock3,
   BadgeCheck,
@@ -15,11 +14,8 @@ function VisitorCheckoutCard({
   setSearch,
   visitor,
   loading,
-  feedback,
-  setFeedback,
   onSearch,
   onCheckout,
-  onBack,
 }) {
   console.log("VisitorCheckoutCard visitor:", visitor);
   return (
