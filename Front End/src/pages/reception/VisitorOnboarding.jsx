@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Webcam from "react-webcam";
 import api from "../../services/api";
 
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
@@ -34,11 +35,36 @@ function VisitorOnboarding() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const webcamRef = useRef(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [idProof, setIdProof] = useState(null);
 
+  const openCamera = () => setCameraOpen(true);
+
+  const capturePhoto = () => {
+    if (!webcamRef.current) return;
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (!imageSrc) return;
+
+    fetch(imageSrc)
+      .then((r) => r.blob())
+      .then((blob) => {
+        const file = new File([blob], "visitor-photo.jpg", { type: "image/jpeg" });
+        setPhoto(file);
+        setCameraOpen(false);
+      });
+  };
+
+  const retakePhoto = () => {
+    setPhoto(null);
+    setCameraOpen(true);
+  };
+
+
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     fetchEmployees();
   }, []);
 
@@ -346,13 +372,13 @@ const response = await api.post(
             </p>
 
             <button
-              type="button"
-              className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-black transition"
+            type="button"
+            // eslint-disable-next-line no-undef
+            onClick={openCamera}
+            className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-black transition"
             >
-              
-              open Camera
-              
-            </button>
+            Open Camera
+          </button>
 
           </div>
 

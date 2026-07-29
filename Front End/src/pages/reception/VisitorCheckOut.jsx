@@ -100,25 +100,6 @@ function VisitorCheckOut() {
 
     }
   };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleNotify = () => {
-    alert("Host notified successfully.");
-  };
-
-  const handleCancel = () => {
-    if (
-      window.confirm(
-        "Cancel checkout?"
-      )
-    ) {
-      navigate("/reception/dashboard");
-    }
-  };
-
   return (
     <ReceptionLayout>
   <div className="space-y-8">

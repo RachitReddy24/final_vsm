@@ -3,7 +3,6 @@ import {
   UserPlus,
   LogIn,
   LogOut,
-  ClipboardList,
 } from "lucide-react";
 
 const receptionMenu = [
@@ -26,11 +25,6 @@ const receptionMenu = [
     title: "Visitor Check-Out",
     icon: LogOut,
     path: "/reception/visitor-check-out",
-  },
-  {
-    title: "Visitor Status",
-    icon: ClipboardList,
-    path: "/reception/visitor-status",
   },
 ];
 

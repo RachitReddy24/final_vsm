@@ -7,10 +7,6 @@ import {
   UserCircle2,
   ChevronDown,
   LogOut,
-  CheckCircle2,
-  UserPlus,
-  ShieldCheck,
-  Clock3,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 function Header({
@@ -57,6 +53,7 @@ const fetchNotifications = async () => {
   }
 };
 useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   fetchNotifications();
 }, []);
   return (
