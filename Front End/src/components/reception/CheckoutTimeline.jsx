@@ -1,10 +1,8 @@
 import { motion } from "framer-motion";
 import {
   UserPlus,
-  QrCode,
   LogIn,
   Users,
-  CheckCircle2,
   LogOut,
 } from "lucide-react";
 
