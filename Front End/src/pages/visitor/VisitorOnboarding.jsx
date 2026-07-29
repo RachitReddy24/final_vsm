@@ -1,20 +1,22 @@
-/* eslint-disable no-undef */
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+ 
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
  
 import {
   UserPlus,
+  Camera,
   QrCode,
   Send,
   CheckCircle2,
 } from "lucide-react";
  
 function VisitorOnboarding() {
-  // eslint-disable-next-line no-undef
   const navigate = useNavigate();
  
-  // eslint-disable-next-line no-undef
   const [employees, setEmployees] = useState([]);
  
   const [formData, setFormData] = useState({
@@ -44,11 +46,9 @@ function VisitorOnboarding() {
   const streamRef = useRef(null);
  
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     fetchEmployees();
   }, []);
  
-// eslint-disable-next-line no-undef
 useEffect(() => {
   return () => {
     if (streamRef.current) {
