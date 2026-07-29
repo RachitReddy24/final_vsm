@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
@@ -5,7 +6,6 @@ import {
   CalendarDays,
   Clock3,
   User,
-  Eye,
 } from "lucide-react";
 
 ;
@@ -55,20 +55,6 @@ const fetchTodayMeetings = async () => {
 
         </div>
 
-        <button
-          className="
-          px-5
-          py-2
-          rounded-xl
-          bg-cyan-600
-          hover:bg-cyan-700
-          text-white
-          transition
-          "
-        >
-          View All
-        </button>
-
       </div>
 
       {/* Table */}
@@ -97,17 +83,13 @@ const fetchTodayMeetings = async () => {
                 Time
               </th>
 
-              <th className="text-center text-slate-400">
-                Action
-              </th>
-
             </tr>
 
           </thead>
 
           <tbody>
 
-            {meetings.map((item, index) => (
+            {meetings.map((item) => (
 
               <tr
                 key={item.id}
@@ -164,31 +146,6 @@ const fetchTodayMeetings = async () => {
                   })}
 
                   </div>
-
-                </td>
-
-                <td className="text-center">
-
-                  <button
-                    className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    px-4
-                    py-2
-                    rounded-xl
-                    bg-cyan-600
-                    hover:bg-cyan-700
-                    text-white
-                    transition
-                    "
-                  >
-
-                    <Eye size={18} />
-
-                    View
-
-                  </button>
 
                 </td>
 

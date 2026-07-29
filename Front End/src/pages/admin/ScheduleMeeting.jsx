@@ -170,15 +170,15 @@ function ScheduleMeeting() {
     <DashboardLayout>
 
       <div className="space-y-8">
-              <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="rounded-3xl border border-slate-800 bg-slate-900 shadow-xl p-8">
 
         <div className="flex items-center gap-3 mb-8">
-          <CalendarPlus className="w-8 h-8 text-blue-600" />
+          <CalendarPlus className="w-8 h-8 text-cyan-400" />
           <div>
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-3xl font-bold text-white">
               Schedule Meeting
             </h1>
-            <p className="text-gray-500">
+            <p className="text-slate-400">
               Create a new meeting for a visitor
             </p>
           </div>
@@ -266,7 +266,7 @@ function ScheduleMeeting() {
 
         <div className="mt-6">
 
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-sm font-semibold text-slate-300 mb-2">
             Purpose
           </label>
 
@@ -287,7 +287,7 @@ function ScheduleMeeting() {
 
         <div className="mt-6">
 
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-sm font-semibold text-slate-300 mb-2">
             Remarks
           </label>
 
@@ -300,7 +300,7 @@ function ScheduleMeeting() {
                 e.target.value
               )
             }
-            className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-2xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 p-4 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
             placeholder="Additional remarks..."
           />
 
