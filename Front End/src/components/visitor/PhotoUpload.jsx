@@ -14,14 +14,14 @@ const handleUpload = (e) => {
 };
  
   return (
-<div className="bg-white rounded-xl shadow border p-6">
+<div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-xl p-6">
  
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-xl font-bold text-white mb-4">
 
         Visitor Photo
 </h2>
  
-      <div className="border-2 border-dashed rounded-xl h-72 flex flex-col justify-center items-center">
+      <div className="border-2 border-dashed border-slate-700 bg-slate-800 rounded-xl h-72 flex flex-col justify-center items-center transition hover:border-cyan-500">
  
         {photo ? (
 <img
@@ -30,15 +30,15 @@ const handleUpload = (e) => {
 
             alt="Visitor"
 
-            className="w-48 h-48 rounded-lg object-cover"
+            className="w-48 h-48 rounded-xl object-cover border-4 border-cyan-500 shadow-lg"
 
           />
 
         ) : (
 <>
-<Camera size={60} />
+<Camera size={60} className="text-cyan-400" />
  
-            <p className="mt-4 text-slate-500">
+            <p className="mt-4 text-slate-300">
 
               Capture or Upload Visitor Photo
 </p>
@@ -66,7 +66,7 @@ const handleUpload = (e) => {
 
             type="button"
 
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+           className="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2 rounded-lg transition"
 
             onClick={() => alert("Camera integration coming next")}
 >
@@ -80,7 +80,7 @@ const handleUpload = (e) => {
 
             onClick={() => fileInputRef.current.click()}
 
-            className="bg-green-600 text-white px-5 py-2 rounded-lg flex gap-2 items-center"
+           className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg flex items-center gap-2 transition"
 >
 <UploadCloud size={18} />
 

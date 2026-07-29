@@ -37,17 +37,12 @@ function RegistrationForm({ photo, idProof }) {
 
     company: "",
 
-    gender: "",
+    designation: "",
+    cameFrom: "",
 
     visitorType: "",
 
-    idType: "",
-
-    idNumber: "",
-
     host: "",
-
-    department: "",
 
     purpose: "",
 
@@ -71,7 +66,7 @@ function RegistrationForm({ photo, idProof }) {
 const token = searchParams.get("token");
  
   const handleChange = (e) => {
-
+console.log("CHANGE:", e.target.name, e.target.value);
     setFormData((prev) => ({
 
       ...prev,
@@ -81,8 +76,7 @@ const token = searchParams.get("token");
     }));
 
   };
- console.log("===== HANDLE SUBMIT CALLED =====");
-alert("RegistrationForm Submitted");
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -102,9 +96,10 @@ console.log("Sending:", mobileNumber);
 form.append("mobileNumber", mobileNumber);
 
     form.append("company", formData.company);
-    form.append("designation", "");
+    form.append("designation", formData.designation);
+
     form.append("purpose", formData.purpose);
-    form.append("cameFrom", "");
+   form.append("cameFrom", formData.cameFrom);
 
     if (photo) {
       form.append("photo", photo);
@@ -219,23 +214,24 @@ for (const pair of form.entries()) {
             placeholder="Company"
 
           />
- 
-          <Input
+<Input
+  icon={Briefcase}
+  label="Designation"
+  name="designation"
+  value={formData.designation}
+  onChange={handleChange}
+  placeholder="Enter Designation"
+/>
 
-            icon={User}
-
-            label="Gender"
-
-            name="gender"
-
-            value={formData.gender}
-
-            onChange={handleChange}
-
-            placeholder="Male / Female"
-
-          />
- 
+<Input
+  icon={Building2}
+  label="Came From"
+  name="cameFrom"
+  value={formData.cameFrom}
+  onChange={handleChange}
+  placeholder="Enter City / Place"
+/>
+         
           <Input
 
             icon={Users}
@@ -252,37 +248,8 @@ for (const pair of form.entries()) {
 
           />
  
-          <Input
-
-            icon={FileText}
-
-            label="Government ID"
-
-            name="idType"
-
-            value={formData.idType}
-
-            onChange={handleChange}
-
-            placeholder="Aadhaar / PAN / Passport"
-
-          />
- 
-          <Input
-
-            icon={FileText}
-
-            label="ID Number"
-
-            name="idNumber"
-
-            value={formData.idNumber}
-
-            onChange={handleChange}
-
-            placeholder="Enter ID Number"
-
-          />
+          
+        
  
         </div>
  
@@ -314,21 +281,7 @@ for (const pair of form.entries()) {
 
           />
  
-          <Input
-
-            icon={Building2}
-
-            label="Department"
-
-            name="department"
-
-            value={formData.department}
-
-            onChange={handleChange}
-
-            placeholder="Department"
-
-          />
+         
  
           <Input
 

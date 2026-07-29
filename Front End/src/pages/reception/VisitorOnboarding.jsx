@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 function VisitorOnboarding() {
+
   const navigate = useNavigate();
 
   const [employees, setEmployees] = useState([]);
@@ -36,8 +37,12 @@ function VisitorOnboarding() {
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [idProof, setIdProof] = useState(null);
+  const videoRef = useRef(null);
+const canvasRef = useRef(null);
+const streamRef = useRef(null);
 
-
+const [cameraOpen, setCameraOpen] = useState(false);
+const [capturedImage, setCapturedImage] = useState(null);
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -69,7 +74,56 @@ const fetchEmployees = async () => {
   const handleGenerateQR = () => {
     alert("QR will be generated automatically after approval.");
   };
+  const handleOpenCamera = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+    });
 
+    streamRef.current = stream;
+    setCameraOpen(true);
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    }, 100);
+  } catch (error) {
+    console.error(error);
+    alert("Unable to access camera");
+  }
+};
+const handleCapturePhoto = () => {
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  ctx.drawImage(video, 0, 0);
+
+  canvas.toBlob((blob) => {
+    const file = new File([blob], "visitor-photo.jpg", {
+      type: "image/jpeg",
+    });
+
+    setPhoto(file);
+setCapturedImage(URL.createObjectURL(file));
+  });
+
+  streamRef.current.getTracks().forEach((track) => track.stop());
+
+  setCameraOpen(false);
+};
+const handleCloseCamera = () => {
+  if (streamRef.current) {
+    streamRef.current.getTracks().forEach((track) => track.stop());
+  }
+
+  setCameraOpen(false);
+};
   const handleSendOTP = async () => {
     if (!formData.mobileNumber) {
       alert("Please enter mobile number.");
@@ -95,7 +149,27 @@ const fetchEmployees = async () => {
       setLoading(false);
     }
   };
+const handleRetake = async () => {
+  setPhoto(null);
+  setCapturedImage(null);
 
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+    });
+
+    streamRef.current = stream;
+    setCameraOpen(true);
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    }, 100);
+  } catch (error) {
+    console.error(error);
+  }
+};
   const handleVerifyOTP = async () => {
     try {
       setLoading(true);
@@ -345,15 +419,80 @@ const response = await api.post(
               Capture visitor photo
             </p>
 
-            <button
-              type="button"
-              className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-black transition"
-            >
-              
-              open Camera
-              
-            </button>
+           <button
+  type="button"
+  onClick={handleOpenCamera}
+  className="px-6 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition"
+>
+  Open Camera
+</button>
+       {cameraOpen && (
+  <div className="mt-6 flex flex-col items-center gap-4">
 
+    <video
+      ref={videoRef}
+      autoPlay
+      playsInline
+      className="w-96 rounded-xl border"
+    />
+
+    <canvas
+      ref={canvasRef}
+      className="hidden"
+    />
+
+    <div className="flex gap-4">
+
+      <button
+        type="button"
+        onClick={handleCapturePhoto}
+        className="bg-green-600 text-white px-5 py-2 rounded-lg"
+      >
+        Capture
+      </button>
+
+      <button
+        type="button"
+        onClick={handleCloseCamera}
+        className="bg-red-600 text-white px-5 py-2 rounded-lg"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+)}
+{capturedImage && !cameraOpen && (
+  <div className="mt-6 flex flex-col items-center gap-4">
+
+    <img
+      src={capturedImage}
+      alt="Visitor"
+      className="w-52 h-52 rounded-xl object-cover border-4 border-cyan-500"
+    />
+
+    <div className="flex gap-4">
+
+      <button
+        type="button"
+        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg"
+      >
+        Use Photo
+      </button>
+
+      <button
+        type="button"
+        onClick={handleRetake}
+        className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg"
+      >
+        Retake
+      </button>
+
+    </div>
+
+  </div>
+)}
           </div>
 
         </div>
