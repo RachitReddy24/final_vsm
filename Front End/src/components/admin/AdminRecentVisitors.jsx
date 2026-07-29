@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import {
-  Eye,
   Clock3,
 } from "lucide-react";
 
@@ -44,6 +43,7 @@ function AdminRecentVisitors() {
   const [visitors, setVisitors] = useState([]);
 
 useEffect(() => {
+  // eslint-disable-next-line react-hooks/immutability
   fetchRecentVisitors();
 }, []);
 
@@ -73,10 +73,6 @@ const fetchRecentVisitors = async () => {
           </p>
         </div>
 
-        <button className="px-5 py-2 rounded-xl bg-cyan-600 text-white hover:bg-cyan-700 transition">
-          View All
-        </button>
-
       </div>
 
       <div className="overflow-x-auto">
@@ -103,17 +99,13 @@ const fetchRecentVisitors = async () => {
                 Time
               </th>
 
-              <th className="text-center text-slate-400">
-                Action
-              </th>
-
             </tr>
 
           </thead>
 
           <tbody>
 
-            {visitors.map((item, index) => (
+            {visitors.map((item) => (
 
               <tr
                 key={item.id}
@@ -146,32 +138,6 @@ const fetchRecentVisitors = async () => {
                   </div>
 
                 </td>
-
-                <td className="text-center">
-
-                  <button
-                    className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    px-4
-                    py-2
-                    rounded-xl
-                    bg-cyan-600
-                    hover:bg-cyan-700
-                    text-white
-                    transition
-                    "
-                  >
-
-                    <Eye size={18} />
-
-                    View
-
-                  </button>
-
-                </td>
-
               </tr>
 
             ))}

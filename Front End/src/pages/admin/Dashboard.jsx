@@ -3,7 +3,6 @@ import AdminLayout from "../../layouts/roles/AdminLayout";
 import AdminWelcome from "../../components/admin/AdminWelcome";
 import AdminStats from "../../components/admin/AdminStats";
 import AdminQuickActions from "../../components/admin/AdminQuickActions";
-import AdminMeetings from "../../components/admin/AdminMeetings";
 import AdminCharts from "../../components/admin/AdminCharts";
 import AdminRecentVisitors from "../../components/admin/AdminRecentVisitors";
 import AdminRecentActivity from "../../components/admin/AdminRecentActivity";
@@ -21,8 +20,6 @@ function Dashboard() {
         <AdminStats />
 
         <AdminQuickActions />
-
-        <AdminMeetings />
 
         <AdminCharts />
 
