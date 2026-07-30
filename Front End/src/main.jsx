@@ -5,7 +5,6 @@ import { Toaster } from "react-hot-toast";
 
 import App from "./App";
 import "./index.css";
-
 import { ThemeProvider } from "./context/ThemeContext";
 import { SidebarProvider } from "./context/SidebarContext";
 import { MeetingProvider } from "./context/MeetingContext";

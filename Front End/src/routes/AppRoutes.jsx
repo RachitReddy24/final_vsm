@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 
 /* ---------------- AUTH ---------------- */
-
+import Landing from "../pages/public/Landing";
 import Login from "../pages/auth/Login";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ProtectedRoute from "./ProtectedRoute";
@@ -55,17 +55,18 @@ function AppRoutes() {
 
       {/* Default */}
 
-      <Route
-        path="/"
-        element={<Navigate to="/login" replace />}
-      />
 
       {/* AUTH */}
 
       <Route
-        path="/login"
-        element={<Login />}
-      />
+  path="/"
+  element={<Landing />}
+/>
+
+<Route
+  path="/login"
+  element={<Login />}
+/>
 
       <Route
         path="/forgot-password"
@@ -263,7 +264,7 @@ function AppRoutes() {
 
       <Route
         path="*"
-        element={<Navigate to="/login" replace />}
+        element={<Navigate to="/" replace />}
       />
       <Route
       path="/reception/pending-approvals"
