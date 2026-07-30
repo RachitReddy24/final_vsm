@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-
+import { useTheme } from "../../context/ThemeContext";
 function FeatureCard({
   icon,
   title,
   description,
   color = "from-cyan-500 to-blue-600",
 }) {
+  const { theme } = useTheme();
   return (
     <motion.div
       whileHover={{
@@ -14,19 +15,11 @@ function FeatureCard({
         rotateX: 6,
       }}
       transition={{ duration: 0.3 }}
-      className="
-        group
-        relative
-        overflow-hidden
-        rounded-3xl
-        border
-        border-slate-800
-        bg-slate-900/60
-        backdrop-blur-xl
-        p-8
-        shadow-xl
-        transition-all
-      "
+      className={`group relative overflow-hidden rounded-3xl backdrop-blur-xl p-8 shadow-xl transition-all ${
+  theme === "dark"
+    ? "border border-slate-800 bg-slate-900/60"
+    : "border border-gray-200 bg-white shadow-lg"
+}`}
     >
       {/* Glow */}
       <div
@@ -62,11 +55,23 @@ function FeatureCard({
         {icon}
       </div>
 
-      <h3 className="relative mt-7 text-2xl font-bold">
+      <h3
+  className={`relative mt-7 text-2xl font-bold ${
+    theme === "dark"
+      ? "text-white"
+      : "text-slate-900"
+  }`}
+>
         {title}
       </h3>
 
-      <p className="relative mt-4 leading-7 text-slate-400">
+      <p 
+  className={`relative mt-4 leading-7 ${
+    theme === "dark"
+      ? "text-slate-400"
+      : "text-slate-600"
+  }`}
+>
         {description}
       </p>
     </motion.div>

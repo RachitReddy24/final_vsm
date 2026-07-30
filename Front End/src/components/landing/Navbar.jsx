@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
+import { useTheme } from "../../context/ThemeContext";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 
 function Navbar() {
   const navigate = useNavigate();
-
+  const { theme } = useTheme();
   return (
     <motion.header
       initial={{ y: -80 }}
@@ -22,16 +22,13 @@ function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 pt-5">
 
-        <div
-          className="
-            rounded-2xl
-            border
-            border-slate-800/60
-            bg-slate-950/60
-            backdrop-blur-2xl
-            shadow-xl
-          "
-        >
+       <div
+  className={`rounded-2xl border backdrop-blur-2xl shadow-xl transition-all duration-300 ${
+    theme === "dark"
+      ? "border-slate-800/60 bg-slate-950/60"
+      : "border-gray-300 bg-white/80"
+  }`}
+>
           <div className="flex items-center justify-between px-8 py-4">
 
             <Logo />
@@ -40,21 +37,33 @@ function Navbar() {
 
               <a
                 href="#home"
-                className="text-slate-300 hover:text-cyan-400 transition"
+                className={`transition hover:text-cyan-500 ${
+  theme === "dark"
+    ? "text-slate-300"
+    : "text-slate-700"
+}`}
               >
                 Home
               </a>
 
               <a
                 href="#features"
-                className="text-slate-300 hover:text-cyan-400 transition"
+                className={`transition hover:text-cyan-500 ${
+  theme === "dark"
+    ? "text-slate-300"
+    : "text-slate-700"
+}`}
               >
                 Features
               </a>
 
               <a
                 href="#about"
-                className="text-slate-300 hover:text-cyan-400 transition"
+                className={`transition hover:text-cyan-500 ${
+  theme === "dark"
+    ? "text-slate-300"
+    : "text-slate-700"
+}`}
               >
                 About
               </a>
@@ -67,19 +76,11 @@ function Navbar() {
 
               <button
                 onClick={() => navigate("/login")}
-                className="
-                  rounded-xl
-                  px-7
-                  py-3
-                  font-semibold
-                  bg-gradient-to-r
-                  from-cyan-500
-                  to-blue-600
-                  hover:scale-105
-                  transition
-                  shadow-lg
-                  shadow-cyan-500/30
-                "
+                className={`rounded-xl px-7 py-3 font-semibold transition hover:scale-105 ${
+  theme === "dark"
+    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30"
+    : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg"
+}`}
               >
                 Login
               </button>

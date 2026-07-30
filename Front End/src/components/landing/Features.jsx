@@ -6,7 +6,7 @@ import {
   Bell,
   CalendarDays,
 } from "lucide-react";
-
+import { useTheme } from "../../context/ThemeContext";
 import { motion } from "framer-motion";
 import FeatureCard from "./FeatureCard";
 
@@ -56,11 +56,16 @@ const features = [
 ];
 
 function Features() {
+  const { theme } = useTheme();
   return (
-    <section
-      id="features"
-      className="relative py-28"
-    >
+   <section
+  id="features"
+  className={`relative py-28 transition-all duration-300 ${
+    theme === "dark"
+      ? "bg-slate-950 text-white"
+      : "bg-gray-50 text-slate-900"
+  }`}
+>
       <div className="mx-auto max-w-7xl px-6">
 
         <motion.div
@@ -69,15 +74,29 @@ function Features() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2 text-cyan-400">
+          <span className={`rounded-full px-5 py-2 border ${
+  theme === "dark"
+    ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+    : "border-cyan-300 bg-cyan-50 text-cyan-700"
+}`}>
             Core Features
           </span>
 
-          <h2 className="mt-6 text-5xl font-black">
+          <h2
+  className={`mt-6 text-5xl font-black ${
+    theme === "dark"
+      ? "text-white"
+      : "text-slate-900"
+  }`}
+>
             Everything You Need
           </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-400">
+          <p className={`mx-auto mt-6 max-w-2xl text-lg leading-8 ${
+  theme === "dark"
+    ? "text-slate-400"
+    : "text-slate-600"
+}`}>
             A complete enterprise solution to simplify visitor
             registration, approvals, security and reporting.
           </p>
