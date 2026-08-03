@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/roles/DashboardLayout";
 
 import MeetingPreviewCard from "../../components/meeting/MeetingPreviewCard";
-import MeetingQRCode from "../../components/meeting/MeetingQRCode";
+import MeetingQRCode from "../../components/meeting/MeetingQRcode";
 
 import api from "../../services/api";
 

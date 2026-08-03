@@ -5,7 +5,7 @@ import api from "../../services/api";
 import ReceptionLayout from "../../layouts/roles/ReceptionLayout";
 
 import CheckoutHeader from "../../components/reception/CheckoutHeader";
-import VisitorCheckoutCard from "../../components/reception/VisitorCheckoutCard";
+import VisitorCheckoutCard from "../../components/reception/VisitorCheckOutCard";
 import MeetingSummary from "../../components/reception/MeetingSummary";
 import ExitRemarks from "../../components/reception/ExitRemarks";
 import CheckoutSuccessModal from "../../components/reception/CheckoutSuccessModal";
