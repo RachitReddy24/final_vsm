@@ -110,48 +110,11 @@ function Footer() {
 
           <div className="text-center mt-6 lg:mt-0">
 
-            <p className="text-slate-500 text-sm mb-2 tracking-widest uppercase">
-
-              Designed & Developed By
-
-            </p>
+            
 
             <h2 className="text-3xl font-black">
 
-              <span
-                className="
-                bg-gradient-to-r
-                from-cyan-300
-                via-blue-400
-                to-indigo-500
-                bg-clip-text
-                text-transparent
-                drop-shadow-[0_0_20px_rgba(59,130,246,1)]
-                animate-pulse
-                "
-              >
-                Rachit Reddy
-              </span>
-
-              <span className="mx-3 text-slate-500">
-                &
-              </span>
-
-              <span
-                className="
-                bg-gradient-to-r
-                from-pink-400
-                via-fuchsia-500
-                to-violet-500
-                bg-clip-text
-                text-transparent
-                drop-shadow-[0_0_20px_rgba(236,72,153,1)]
-                animate-pulse
-                "
-              >
-                Rukmini
-              </span>
-
+            
             </h2>
 
             <p className="mt-3 text-blue-400 font-bold tracking-[4px] uppercase">
