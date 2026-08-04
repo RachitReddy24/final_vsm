@@ -467,7 +467,7 @@ const handleLogoChange = (e) => {
 </p>
 {settings.companyLogo && (
 <img
-  src={`http://localhost:5000/uploads/logos/${settings.companyLogo}?t=${Date.now()}`}
+  src={`/uploads/logos/${settings.companyLogo}?t=${Date.now()}`}
   alt="Company Logo"
   style={{
     width: "150px",
